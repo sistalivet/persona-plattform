@@ -1,0 +1,1510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Persona</title>
+<style>
+  :root{
+    --bg:#100f12; --surface:#1a181e; --surface-2:#211e26; --panel2:#141218; --line:#2c2831; --line-2:#3a3540;
+    --ink:#f3ede2; --muted:#a89f95; --faint:#756d66;
+    --gold:#e9b96a; --gold-bright:#f4cd86; --gold-deep:#c89441; --gold-soft:#241d12;
+    --rose:#d98a7c;
+    --good:#8fce9a; --danger:#ea7c63;
+    --serif:"Georgia","Iowan Old Style",ui-serif,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;
+    background-attachment:fixed;
+    background-image:
+      radial-gradient(105% 42% at 50% -6%, rgba(233,185,106,.08), transparent 60%),
+      radial-gradient(85% 55% at 88% 106%, rgba(200,84,72,.17), transparent 60%),
+      radial-gradient(72% 52% at 6% 116%, rgba(200,84,72,.10), transparent 60%),
+      radial-gradient(60% 45% at 100% 28%, rgba(200,84,72,.07), transparent 55%)}
+  header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+    padding:16px 26px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(16,15,18,.86);
+    backdrop-filter:blur(8px);z-index:5}
+  .brand{font-family:var(--serif);font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0}
+  .brand .dot{color:var(--gold)}
+  header .who{color:var(--muted);font-size:13px;margin-right:6px}
+  main{max-width:900px;margin:0 auto;padding:26px}
+  .box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+  h2{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold);
+    margin:30px 0 12px;font-weight:600;display:flex;align-items:center;gap:11px}
+  h2::before{content:"";width:22px;height:1px;background:linear-gradient(90deg,var(--gold),var(--rose) 65%,transparent)}
+  h2:first-child{margin-top:0}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field.grow{flex:1;min-width:220px}
+  label{font-size:12px;color:var(--muted)}
+  select,input,textarea{background:var(--panel2);border:1px solid var(--line-2);color:var(--ink);
+    border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit}
+  textarea{width:100%;resize:vertical;line-height:1.55}
+  select:focus,input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;border:0;
+    padding:0;height:20px;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:3px;
+    background:linear-gradient(90deg,var(--gold-deep),var(--rose));opacity:.7}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;
+    border-radius:50%;background:var(--gold-bright);border:2px solid var(--bg);margin-top:-5px;
+    box-shadow:0 0 0 1px var(--gold-deep)}
+  input[type=range]::-moz-range-track{height:5px;border-radius:3px;
+    background:linear-gradient(90deg,var(--gold-deep),var(--rose));opacity:.7}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;
+    background:var(--gold-bright);border:2px solid var(--bg)}
+  input[type=range]:hover::-webkit-slider-runnable-track{opacity:1}
+  input[type=range]:hover::-moz-range-track{opacity:1}
+  .field.slim{width:148px;flex:none}
+  .field.slim label{font-size:11px;color:var(--faint)}
+  button.btn{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#231a08;border:0;border-radius:9px;
+    padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.02em}
+  button.btn:hover{filter:brightness(1.05)} button.btn:disabled{opacity:.5;cursor:default;filter:none}
+  button.ghost{background:transparent;border:1px solid var(--line-2);color:var(--muted);border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer}
+  button.ghost:hover{border-color:var(--gold);color:var(--gold-bright)}
+  .hint{color:var(--muted);font-size:12.5px}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--line-2);border-top-color:var(--gold);
+    border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .chip{display:inline-block;font-size:11.5px;border:1px solid var(--line-2);border-radius:20px;padding:3px 11px;margin:2px 5px 2px 0;color:var(--muted)}
+  .chip.on{color:#231a08;background:var(--gold);border-color:var(--gold);font-weight:600}
+  .clip{display:flex;flex-direction:column;gap:8px;width:172px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .clip video{width:100%;border-radius:8px;background:#000}
+  .clip .acts{display:flex;flex-wrap:wrap;gap:6px}
+  .clip .dl,.clip .ghost{padding:6px 10px;font-size:12px}
+  details.sect{border:1px solid var(--line);border-radius:14px;background:var(--surface);margin-top:14px}
+  details.sect>summary{list-style:none;cursor:pointer;padding:14px 18px;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);display:flex;align-items:center;gap:10px}
+  details.sect>summary::-webkit-details-marker{display:none}
+  details.sect>summary::before{content:"▸";display:inline-block;transition:transform .15s ease}
+  details.sect[open]>summary::before{transform:rotate(90deg)}
+  details.sect>summary .sub{margin-left:auto;color:var(--muted);text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:12px}
+  details.sect>.inner{padding:4px 18px 18px}
+  .err{color:var(--danger)} .empty{color:var(--muted);padding:16px;text-align:center}
+  a.dl{background:color-mix(in srgb,var(--good) 22%,var(--surface));color:var(--good);border:1px solid color-mix(in srgb,var(--good) 45%,transparent);
+    border-radius:9px;padding:8px 14px;font-weight:600;text-decoration:none;display:inline-block;font-size:13.5px}
+  a.dl:hover{filter:brightness(1.1)}
+  .grid{display:flex;flex-wrap:wrap;gap:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1 class="brand">Persona<span class="dot">.</span></h1>
+  <div><span class="who" id="who"></span><button class="ghost" onclick="logout()">Log out</button></div>
+</header>
+<main>
+  <h2>Create video</h2>
+  <div class="box">
+    <div class="row" style="margin-bottom:12px;align-items:flex-end">
+      <div class="field"><label>Style template</label><select id="style" onchange="applyStyle()">
+        <option value="">— none —</option></select></div>
+      <button class="ghost" onclick="saveStyle()" style="padding:8px 12px;font-size:12.5px">Save current as …</button>
+      <button class="ghost" onclick="deleteStyle()" style="padding:8px 12px;font-size:12.5px" title="Delete selected template">✕</button>
+      <span class="hint" id="stylehint"></span>
+    </div>
+    <div class="row">
+      <div class="field"><label>Avatar</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="preset"><option>— loading —</option></select>
+          <img id="avprev" alt="" title="Preview of the selected avatar"
+            style="height:66px;aspect-ratio:9/16;object-fit:cover;border-radius:8px;background:#000;display:none;border:1px solid var(--line-2)">
+        </div></div>
+      <div class="field"><label>Look</label><select id="look">
+        <option value="warm" selected>warm</option><option value="subtle">subtle</option>
+        <option value="strong">strong</option><option value="none">unchanged</option></select></div>
+      <div class="field"><label>Lip sync</label><select id="lipsync">
+        <option value="standard" selected>Standard</option>
+        <option value="premium">Premium (sharper, ~65% more)</option></select></div>
+      <div class="field grow"><label>Title <span class="hint">(optional — for your video list)</span></label>
+        <input id="vtitle" maxlength="80" placeholder="e.g. Weekly update 34"></div>
+      <div class="field"><label>Ressort <span class="hint">(Newsroom)</span></label><select id="ressort">
+        <option value="" selected>— none —</option>
+        <option>Innenpolitik</option>
+        <option>Außenpolitik</option>
+        <option>Umwelt &amp; Klima</option>
+        <option>Meinung</option></select></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field"><label>Language</label><select id="lang" onchange="estDur()">
+        <option value="de" selected>Deutsch</option><option value="en">English</option>
+        <option value="fr">Français</option><option value="es">Español</option>
+        <option value="it">Italiano</option><option value="pt">Português</option>
+        <option value="nl">Nederlands</option><option value="sv">Svenska</option>
+        <option value="da">Dansk</option><option value="pl">Polski</option></select></div>
+      <div class="field"><label>Background</label><select id="bg"><option value="none">Original (keep)</option></select></div>
+      <div class="field grow"><label>Voice</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="voice" style="flex:1" onchange="onVoiceChange()">
+            <option value="">Avatar voice (cloned)</option>
+          </select>
+          <button class="ghost" id="voiceplay" type="button" onclick="previewVoice()"
+            title="Play sample" style="display:none;padding:8px 12px">▶</button>
+        </div></div>
+    </div>
+    <audio id="voiceaudio" style="display:none"></audio>
+    <div class="row" style="margin-top:12px">
+      <div class="field"><label>Subtitles</label><select id="cap"><option value="on" selected>on</option><option value="off">off</option></select></div>
+      <div class="field"><label>Style</label><select id="capstyle">
+        <option value="clean">Clean</option><option value="gelb">Yellow</option><option value="box" selected>Box</option></select></div>
+      <div class="field slim"><label>Caption pos: <span id="capyv">0.80</span></label>
+        <input id="capy" type="range" min="0" max="1" step="0.02" value="0.80"
+          oninput="$('#capyv').textContent=parseFloat(this.value).toFixed(2)"></div>
+      <div class="field"><label>Size</label><select id="capsize">
+        <option value="s">small</option><option value="m" selected>medium</option><option value="l">large</option></select></div>
+    </div>
+    <div class="row" style="margin-top:12px;gap:20px">
+      <div class="field slim"><label>Vignette: <span id="vigv">0.40</span></label>
+        <input id="vig" type="range" min="0" max="1" step="0.05" value="0.4"
+          oninput="$('#vigv').textContent=parseFloat(this.value).toFixed(2)"></div>
+      <div class="field slim"><label>Speed: <span id="spdv">1.00×</span></label>
+        <input id="spd" type="range" min="0.5" max="1.5" step="0.05" value="1"
+          oninput="$('#spdv').textContent=parseFloat(this.value).toFixed(2)+'×'"></div>
+      <div class="field"><label>Pauses</label><select id="pauses">
+        <option value="0">off</option><option value="1">every sentence</option>
+        <option value="2" selected>every 2 sentences</option><option value="3">every 3 sentences</option></select></div>
+    </div>
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;color:var(--muted);font-size:12.5px;user-select:none">Advanced color</summary>
+      <div class="row" style="margin-top:10px;gap:20px">
+        <div class="field slim"><label>Brightness: <span id="brtv">0</span></label>
+          <input id="brt" type="range" min="-0.3" max="0.3" step="0.02" value="0"
+            oninput="$('#brtv').textContent=(this.value>0?'+':'')+parseFloat(this.value).toFixed(2)"></div>
+        <div class="field slim"><label>Contrast: <span id="conv">0</span></label>
+          <input id="con" type="range" min="-0.3" max="0.3" step="0.02" value="0"
+            oninput="$('#conv').textContent=(this.value>0?'+':'')+parseFloat(this.value).toFixed(2)"></div>
+        <div class="field slim" style="width:180px"><label>Warmth <span class="hint">(cool ↔ warm)</span>: <span id="warv">0</span></label>
+          <input id="war" type="range" min="-1" max="1" step="0.05" value="0"
+            oninput="$('#warv').textContent=(this.value>0?'+':'')+parseFloat(this.value).toFixed(2)"></div>
+      </div>
+    </details>
+    <details id="lookprev" style="margin-top:10px">
+      <summary style="cursor:pointer;color:var(--muted);font-size:12.5px;user-select:none">Preview look</summary>
+      <div style="margin-top:10px;text-align:center">
+        <img id="lprev" alt="Look preview" style="max-height:360px;max-width:100%;border-radius:10px;background:#000;min-height:120px">
+        <div class="hint" id="lprevhint" style="margin-top:6px">Still frame from your avatar with the current color settings.</div>
+      </div>
+    </details>
+    <div class="field grow" style="margin-top:12px">
+      <label>Script
+        <select id="scriptsecs" title="Target length for the suggestion"
+          style="padding:2px 6px;font-size:11.5px;margin-left:8px">
+          <option value="">auto length</option><option value="15">~15s</option>
+          <option value="20" selected>~20s</option><option value="30">~30s</option>
+          <option value="45">~45s</option><option value="60">~60s</option></select>
+        <button class="ghost" id="suggest" type="button" onclick="suggestScript()"
+          style="padding:3px 10px;font-size:12px;margin-left:6px">✨ Suggest from notes</button>
+        <button class="ghost" id="translate" type="button" onclick="translateScript()"
+          title="Translate the script into the selected language"
+          style="padding:3px 10px;font-size:12px;margin-left:6px">🌐 Translate</button>
+        <select id="hist" onchange="restoreScript()" title="Restore an earlier script"
+          style="padding:2px 6px;font-size:11.5px;margin-left:6px;max-width:220px">
+          <option value="">↺ History</option></select></label>
+      <input id="tone" placeholder="Tone for suggestions — e.g. cool and humorous (remembered per avatar)"
+        style="margin-top:6px;width:100%;font-size:12.5px">
+      <textarea id="text" rows="4" style="margin-top:6px" placeholder="Write bullet points or rough notes, then click ‘Suggest from notes’ — or type the final script yourself." oninput="estDur()"></textarea>
+      <div class="hint" id="durhint"></div></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="go" onclick="create()">Create video</button>
+      <span class="hint">Runs 3–5 min in the background. You can keep this window open.</span>
+    </div>
+    <div id="result" style="margin-top:14px"></div>
+  </div>
+
+  <details class="sect" id="sectNews"><summary>Newsroom <span class="sub" id="newssub"></span></summary>
+  <div class="inner">
+    <div class="row" style="align-items:center;margin-bottom:10px">
+      <span class="hint">Daily scan of German news (Politik · Deutschland · Wirtschaft · Finanzen · Kultur · Sport · Tech), constructive topics first. Pick one → notes land in the script field → Suggest.</span>
+      <button class="ghost" id="newsrefresh" onclick="refreshNewsroom()" style="display:none;padding:6px 12px;font-size:12px">↻ Scan now</button>
+      <span class="hint" id="newshint"></span>
+    </div>
+    <div id="tickerbox" style="border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px">
+      <div class="row" style="align-items:center;gap:12px">
+        <b style="font-size:13px">Live ticker on the site</b>
+        <label class="hint"><input type="checkbox" id="tk_auto" onchange="saveTicker()"> Auto: headlines of the latest scan, replaced automatically with every new scan (✕ hides a line for today)</label>
+        <span class="hint" id="tk_hint"></span>
+      </div>
+      <div id="tk_list" class="hint" style="margin-top:6px"></div>
+      <div class="row" style="margin-top:8px;align-items:flex-end">
+        <div class="field grow"><label>Add your own line</label><input id="tk_text" maxlength="140" placeholder="Headline for the ticker"></div>
+        <div class="field grow"><label>Link <span class="hint">(optional)</span></label><input id="tk_url" placeholder="https://…"></div>
+        <button class="ghost" onclick="addTickerManual()">+ Ticker</button>
+      </div>
+    </div>
+    <div id="news"><div class="empty">loading …</div></div>
+  </div>
+  </details>
+
+  <details class="sect"><summary>Branding <span class="sub">Logo &amp; lower third</span></summary>
+  <div class="inner">
+    <div class="row">
+      <div class="field"><label>Branding on videos</label><select id="brand">
+        <option value="on" selected>on</option><option value="off">off</option></select></div>
+      <div class="field"><label>„AI-generated" label</label><select id="ailabel">
+        <option value="on" selected>on</option><option value="off">off</option></select></div>
+    </div>
+    <div class="hint" style="margin-top:2px">The „KI-erzeugt" label marks videos as AI-generated (EU AI Act). Leave it on unless you have a specific reason.</div>
+    <div class="row" style="margin-top:12px">
+      <div class="field grow"><label>Name (lower third)</label><input id="bname" placeholder="e.g. Max Stadler"></div>
+      <div class="field grow"><label>Title</label><input id="btitle" placeholder="e.g. Journalist"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field"><label>Accent color</label>
+        <input id="baccent" type="color" value="#e9b96a" style="padding:4px;height:38px;width:60px"></div>
+      <div class="field"><label>Lower-third duration</label><select id="bsec">
+        <option value="0">off</option><option value="3">3 s</option><option value="4" selected>4 s</option>
+        <option value="6">6 s</option><option value="8">8 s</option></select></div>
+      <div class="field"><label>Logo position</label><select id="bpos">
+        <option value="tr" selected>top right</option><option value="tl">top left</option>
+        <option value="br">bottom right</option><option value="bl">bottom left</option></select></div>
+    </div>
+    <div class="row" style="margin-top:14px;align-items:center">
+      <div class="field grow"><label>Logo (PNG, transparent recommended)</label>
+        <input id="blogo" type="file" accept="image/*" onchange="uploadLogo()" style="font-size:12.5px"></div>
+      <img id="blogoprev" alt="Logo" style="height:44px;border-radius:8px;background:#0006;padding:4px;display:none">
+      <button class="ghost" id="blogodel" onclick="deleteLogo()" style="display:none">Remove logo</button>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" onclick="saveBranding()">Save branding</button>
+      <span class="hint" id="bhint">Applies to all new videos when "Branding: on" is selected above.</span>
+    </div>
+  </div>
+  </details>
+
+  <details class="sect" id="sectFraming"><summary>Framing <span class="sub">Face crop per avatar</span></summary>
+  <div class="inner">
+    <div class="row">
+      <div class="field"><label>Avatar</label><select id="fpreset"></select></div>
+      <div class="field grow"><label>Zoom: <span id="fzoomv">1.30</span></label>
+        <input id="fzoom" type="range" min="1" max="3.5" step="0.05" value="1.3"></div>
+      <div class="field grow"><label>Vertical position: <span id="fyv">0.20</span></label>
+        <input id="fy" type="range" min="0" max="1" step="0.02" value="0.2"></div>
+    </div>
+    <div style="margin-top:12px;text-align:center">
+      <img id="fprev" alt="Preview" style="max-height:420px;max-width:100%;border-radius:10px;background:#000"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" onclick="saveFraming()">Save framing</button>
+      <span class="hint" id="fhint">Controls how tightly the face is cropped (for lip sync). Preview above is live.</span>
+    </div>
+  </div>
+  </details>
+
+  <details class="sect"><summary>Add avatar <span class="sub">Upload video, clone voice</span></summary>
+  <div class="inner">
+    <div class="row">
+      <div class="field" id="autargetwrap" style="display:none"><label>Account (admin)</label><select id="autarget"></select></div>
+      <div class="field grow"><label>Avatar name</label><input id="auname" placeholder="e.g. Björn – News"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field grow"><label>Video (yourself, front-facing, well lit)</label>
+        <input id="aufile" type="file" accept="video/*" style="font-size:12.5px"></div>
+    </div>
+    <label style="display:flex;gap:9px;align-items:flex-start;margin-top:12px;font-size:12.5px;color:var(--muted);cursor:pointer">
+      <input type="checkbox" id="auconsent" style="margin-top:3px;width:16px;height:16px;accent-color:var(--gold)">
+      <span>I confirm I have the right to use this person's face and voice for AI-generated videos, and that this person has consented (use the <a href="/consent" target="_blank">consent form</a>, DE/EN).</span>
+    </label>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="aubtn" onclick="uploadAvatar()">Upload + clone voice</button>
+    </div>
+    <div class="hint" id="auhint" style="margin-top:10px">On upload, the voice is cloned from the video (takes up to ~30 s). Afterwards the avatar is selectable above.</div>
+  </div>
+  </details>
+
+  <details class="sect"><summary>Backgrounds <span class="sub">Create your own</span></summary>
+  <div class="inner">
+    <div class="row">
+      <div class="field grow"><label>Describe a new background</label>
+        <input id="bgprompt" maxlength="300" placeholder="e.g. modern newsroom, soft warm light, glass wall"></div>
+      <div class="field"><label>Name</label><input id="bgname" maxlength="40" style="width:150px" placeholder="e.g. Newsroom"></div>
+      <button class="btn" id="bggen" onclick="genBg()">✨ Generate</button>
+    </div>
+    <div class="row" style="margin-top:12px;align-items:center">
+      <div class="field grow"><label>… or upload your own image (JPG/PNG, ideally portrait)</label>
+        <input id="bgfile" type="file" accept="image/*" style="font-size:12.5px"></div>
+      <button class="ghost" onclick="upBg()">Upload image</button>
+    </div>
+    <div id="mybgs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px"></div>
+    <div class="hint" id="bghint" style="margin-top:8px">Generated images cost ~1 cent, are slightly blurred (looks natural behind a person) and contain no people. Your backgrounds appear under "My backgrounds" in the Background menu.</div>
+  </div>
+  </details>
+
+  <details class="sect"><summary>Account <span class="sub">Change password</span></summary>
+  <div class="inner">
+    <div class="row">
+      <div class="field"><label>Current password</label>
+        <input id="pwcur" type="password" autocomplete="current-password"></div>
+      <div class="field"><label>New password (min. 8 characters)</label>
+        <input id="pwnew" type="password" autocomplete="new-password"></div>
+      <button class="btn" onclick="changePassword()">Change password</button>
+    </div>
+    <div class="hint" id="pwhint" style="margin-top:10px"></div>
+  </div>
+  </details>
+
+  <details class="sect" id="sectUsage"><summary>Usage <span class="sub" id="usagesub"></span></summary>
+  <div class="inner"><div id="usage"><div class="empty">loading …</div></div></div>
+  </details>
+
+  <details class="sect" id="sectBlog"><summary>Blog posts <span class="sub" id="blogcount">Write, edit, publish on /news</span></summary>
+  <div class="inner">
+    <div class="row" style="align-items:center;gap:10px">
+      <button class="ghost" onclick="newPost()">+ New post</button>
+      <a class="hint" href="/news" target="_blank">Open /news ↗</a>
+      <span class="hint" id="bloghint"></span>
+    </div>
+    <div id="postform" style="display:none;margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:12px">
+      <input type="hidden" id="pf_id">
+      <div class="row">
+        <div class="field grow"><label>Title</label><input id="pf_titel" maxlength="120" placeholder="Headline"></div>
+        <div class="field"><label>Ressort</label><select id="pf_ressort">
+          <option value="">— none —</option></select></div>
+      </div>
+      <div class="field" style="margin-top:10px"><label>Teaser <span class="hint">(one or two sentences, shown on the front page and in link previews)</span></label>
+        <input id="pf_teaser" maxlength="300" placeholder="What is this about, in one breath?"></div>
+      <div class="field" style="margin-top:10px"><label>Article text <span class="hint">(blank line = new paragraph)</span></label>
+        <textarea id="pf_text" rows="9" style="width:100%"></textarea></div>
+      <div class="row" style="margin-top:10px;align-items:flex-end">
+        <div class="field grow"><label>Video <span class="hint">(from My videos; optional)</span></label>
+          <select id="pf_video"><option value="">— keep current / none —</option></select></div>
+        <div class="field"><label>… or upload a video file <span class="hint">(mp4/mov, max 500 MB)</span></label>
+          <input type="file" id="pf_file" accept="video/*"></div>
+        <button class="ghost" id="pf_upbtn" onclick="postUpload()">Upload</button>
+        <label class="hint" id="pf_rmwrap" style="display:none"><input type="checkbox" id="pf_rm"> remove current video</label>
+      </div>
+      <div class="hint" id="pf_uphint"></div>
+      <div class="field" style="margin-top:10px"><label>Sources <span class="hint">(one link per line, max 10)</span></label>
+        <textarea id="pf_quellen" rows="2" style="width:100%" placeholder="https://…"></textarea></div>
+      <div class="field" style="margin-top:10px"><label>Social posts on this topic <span class="hint">(one link per line, max 8; optional own title: “Title | link”. Title, author and preview are fetched automatically for YouTube, TikTok, X, Bluesky.)</span></label>
+        <textarea id="pf_social" rows="2" style="width:100%" placeholder="https://www.youtube.com/watch?v=…&#10;Was die Leute dazu sagen | https://www.tiktok.com/@…"></textarea></div>
+      <div class="row" style="margin-top:12px;gap:10px">
+        <button class="btn" id="pf_save" onclick="savePost()">Save &amp; publish</button>
+        <button class="ghost" onclick="$('#postform').style.display='none'">Cancel</button>
+        <span class="hint" id="pf_hint"></span>
+      </div>
+    </div>
+    <div id="postlist" style="margin-top:12px"><div class="empty">loading …</div></div>
+    <details id="sitesettings" style="margin-top:16px;display:none"><summary class="hint" style="cursor:pointer">Site settings (admin): name, claim, ressorts, about, domain, search engines</summary>
+      <div style="padding:12px;border:1px solid var(--line);border-radius:12px;margin-top:8px">
+        <div class="row">
+          <div class="field grow"><label>Site name</label><input id="ss_name" maxlength="60"></div>
+          <div class="field grow"><label>Claim <span class="hint">(under the name)</span></label><input id="ss_claim" maxlength="200"></div>
+          <div class="field"><label>Domain <span class="hint">(without www)</span></label><input id="ss_domain" placeholder="persona-ainews.ch" style="width:200px"></div>
+          <div class="field"><label>Google verification code <span class="hint">(Search Console, HTML-tag method: only the content value)</span></label><input id="ss_gsv" placeholder="e.g. AbC123…" style="width:260px"></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="field"><label>Ressorts <span class="hint">(one per line, order = menu order)</span></label><textarea id="ss_ressorts" rows="8" style="width:220px"></textarea></div>
+          <div class="field grow"><label>About us <span class="hint">(page “Über uns”; blank line = paragraph)</span></label><textarea id="ss_about" rows="8" style="width:100%"></textarea></div>
+        </div>
+        <div class="row" style="margin-top:10px;align-items:center;gap:14px">
+          <label class="hint"><input type="checkbox" id="ss_index"> Allow search engines (removes noindex). Leave off while testing.</label>
+          <label class="hint"><input type="checkbox" id="ss_scores" checked> Show Konstruktiv-Scores and Media check on the site</label>
+          <button class="ghost" onclick="saveSite()">Save site settings</button><span class="hint" id="ss_hint"></span>
+        </div>
+      </div>
+    </details>
+  </div>
+  </details>
+
+  <details class="sect" id="sectReviews"><summary>Media check <span class="sub" id="rvcount">Konstruktiv-Score for articles of other media</span></summary>
+  <div class="inner">
+    <div class="hint">Paste a link to an article. The server reads the public text, the model scores it (same criteria as our own posts, ~1 ct), and nothing is shown on the site until you approve it. Paywalled articles cannot be read.</div>
+    <div class="row" style="margin-top:10px;align-items:flex-end">
+      <div class="field grow"><label>Article link</label><input id="rv_url" placeholder="https://www.tagesschau.de/…"></div>
+      <button class="btn" id="rv_go" onclick="reviewCheck()">Check</button>
+      <span class="hint" id="rv_hint"></span>
+    </div>
+    <div id="rv_result" style="margin-top:10px"></div>
+    <div id="rv_list" style="margin-top:12px"><div class="empty">loading …</div></div>
+  </div>
+  </details>
+
+  <details class="sect" id="sectProfiles"><summary>Avatar profiles <span class="sub" id="profcount">Shown on “Über uns”: photo, bio, ressorts</span></summary>
+  <div class="inner">
+    <div class="row" style="align-items:center;gap:10px">
+      <button class="ghost" onclick="newProfile()">+ New profile</button>
+      <a class="hint" href="#" onclick="window.open(siteBase()+'/ueber');return false">Open “Über uns” ↗</a>
+      <span class="hint" id="profhint"></span>
+    </div>
+    <div id="profform" style="display:none;margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:12px">
+      <input type="hidden" id="pr_slug">
+      <div class="row">
+        <div class="field grow"><label>Name <span class="hint">(as shown on the site)</span></label><input id="pr_name" maxlength="60" placeholder="e.g. Björn"></div>
+        <div class="field grow"><label>One line <span class="hint">(role, e.g. “Spricht Politik und Wirtschaft”)</span></label><input id="pr_kurz" maxlength="120"></div>
+        <div class="field"><label>Order</label><input id="pr_order" type="number" min="0" value="0" style="width:70px"></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field"><label>Ressorts</label><div id="pr_ressorts" style="display:flex;flex-wrap:wrap;gap:6px 12px;padding:8px 0"></div></div>
+      </div>
+      <div class="field" style="margin-top:6px"><label>Bio <span class="hint">(blank line = paragraph)</span></label><textarea id="pr_text" rows="5" style="width:100%"></textarea></div>
+      <div class="row" style="margin-top:10px;align-items:flex-end">
+        <div class="field grow"><label>Persona avatars of this person <span class="hint">(posts made with these avatars show “Beiträge von …”)</span></label>
+          <div id="pr_avatars" style="display:flex;flex-wrap:wrap;gap:6px 12px;padding:8px 0"></div>
+          <input id="pr_avatars_extra" placeholder="other avatar names, comma-separated (e.g. from another account)"></div>
+      </div>
+      <div class="row" style="margin-top:10px;gap:10px">
+        <button class="btn" id="pr_save" onclick="saveProfile()">Save profile</button>
+        <button class="ghost" onclick="$('#profform').style.display='none'">Cancel</button>
+        <label class="hint"><input type="checkbox" id="pr_visible" checked> visible on the site</label>
+        <span class="hint" id="pr_hint"></span>
+      </div>
+      <div class="row" style="margin-top:12px;align-items:flex-end;gap:10px" id="pr_photorow">
+        <div class="field"><label>Photo <span class="hint">(JPG/PNG, becomes a square)</span></label><input type="file" id="pr_file" accept="image/*"></div>
+        <button class="ghost" onclick="profilePhotoUpload()">Upload photo</button>
+        <span class="hint">or</span>
+        <select id="pr_still"></select>
+        <button class="ghost" onclick="profilePhotoStill()">Still from this avatar</button>
+        <span class="hint" id="pr_phint"></span>
+      </div>
+    </div>
+    <div id="proflist" style="margin-top:12px"><div class="empty">loading …</div></div>
+  </div>
+  </details>
+
+  <details class="sect" id="sectGoals"><summary>Goals <span class="sub">Reach · constructive · impact</span></summary>
+  <div class="inner">
+    <style>
+      .gt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+      .gt th{text-align:left;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-2);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase}
+      .gt td{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+      .gt td.t{white-space:normal;max-width:280px}
+      .gt tr:last-child td{border-bottom:0}
+      .gwrap{overflow-x:auto}
+      .kpi{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+      .kpi div{background:var(--panel,#141218);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:120px}
+      .kpi b{display:block;font-size:20px;color:var(--gold-bright,#f4cd86)}
+      .kpi span{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+      .gh{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 4px;font-weight:600}
+    </style>
+    <div class="hint">Blog numbers are counted cookieless on /news (daily-unique visits, video plays, watch-through, reaction buttons). Social numbers you enter once a week from the platform insights. Collect 4 weeks of baseline before setting targets.</div>
+    <div id="goals"><div class="empty">loading …</div></div>
+    <div class="gh">Facebook · automatic (Meta API)</div>
+    <div id="metabox"><div class="hint">loading …</div></div>
+    <div class="gh">Screenshots by e-mail</div>
+    <div class="hint" id="st_intro">Everyone who posts your videos sends a screenshot of their platform statistics to <b id="st_addr">…</b> (weekly, e.g. Monday). Only registered senders are read; the model extracts the numbers, the sender gets an automatic reply, and you confirm below. Confirmed numbers land in the social table.</div>
+    <div class="row" style="margin-top:8px;align-items:flex-end">
+      <div class="field"><label>Name</label><input id="st_name" placeholder="Björn" style="width:120px"></div>
+      <div class="field grow"><label>E-mail of the sender</label><input id="st_email" placeholder="name@example.com"></div>
+      <div class="field"><label>Platform <span class="hint">(optional)</span></label><select id="st_plat"><option value="">detect from image</option>
+        <option>instagram</option><option>tiktok</option><option>facebook</option><option>youtube</option><option>x</option><option>linkedin</option><option>threads</option><option>bluesky</option></select></div>
+      <div class="field"><label>Account <span class="hint">(optional)</span></label><input id="st_konto" placeholder="@handle" style="width:130px"></div>
+      <button class="ghost" onclick="saveSender()">Register sender</button>
+      <button class="ghost" onclick="statsPull(this)" title="Fetch the mailbox now (otherwise every 15 min)">↻ Fetch mail now</button>
+      <span class="hint" id="st_hint"></span>
+    </div>
+    <div id="st_senders" class="hint" style="margin-top:6px"></div>
+    <div id="st_inbox" style="margin-top:10px"></div>
+    <div class="gh">Instagram / YouTube / TikTok · weekly numbers (manual)</div>
+    <div class="row" style="align-items:flex-end">
+      <div class="field"><label>Week</label><input id="swweek" placeholder="2026-W37" style="width:110px"></div>
+      <div class="field"><label>Platform</label><select id="swplat">
+        <option value="facebook">Facebook</option><option value="instagram">Instagram</option>
+        <option value="youtube">YouTube</option><option value="tiktok">TikTok</option></select></div>
+      <div class="field"><label>Reach</label><input id="swreach" type="number" min="0" style="width:90px"></div>
+      <div class="field"><label>Video views</label><input id="swviews" type="number" min="0" style="width:90px"></div>
+      <div class="field"><label>Followers</label><input id="swfol" type="number" min="0" style="width:90px"></div>
+      <div class="field"><label>Shares</label><input id="swsh" type="number" min="0" style="width:80px"></div>
+      <div class="field"><label>Positive reactions</label><input id="swpos" type="number" min="0" style="width:80px" title="Like, Love, Care"></div>
+      <div class="field"><label>Angry</label><input id="swneg" type="number" min="0" style="width:70px"></div>
+      <button class="ghost" onclick="saveSocial()">Save week</button>
+      <span class="hint" id="swhint"></span>
+    </div>
+    <div id="socialtbl"></div>
+  </div>
+  </details>
+
+  <details class="sect" id="sectVideos"><summary>My videos <span class="sub" id="vidcount"></span></summary>
+  <div class="inner"><div id="videos"><div class="empty">loading …</div></div></div>
+  </details>
+
+  <details class="sect" id="sectClip"><summary>Clip <span class="sub">Cut a moment · multi-format · free</span></summary>
+  <div class="inner">
+    <div class="row" style="align-items:flex-end">
+      <div class="field grow"><label>Source</label><select id="clipsrc" onchange="clipSrcChange()"></select></div>
+      <div class="field"><label>Upload a long recording <span class="hint">(max 500 MB)</span></label>
+        <input type="file" id="clipfile" accept="video/mp4,video/quicktime,video/*"></div>
+      <button class="ghost" id="clipupbtn" onclick="clipUpload()">Upload</button>
+    </div>
+    <video id="clipplayer" controls preload="metadata"
+      style="width:100%;max-height:320px;background:#000;border-radius:10px;margin-top:12px;display:none"></video>
+    <div class="row" style="margin-top:12px;align-items:flex-end">
+      <div class="field"><label>Start (s)</label><input id="clipstart" type="number" min="0" step="0.1" value="0" style="width:92px"></div>
+      <button class="ghost" onclick="setClipMark('clipstart')" title="Take current player position">⌖ from player</button>
+      <div class="field"><label>End (s)</label><input id="clipend" type="number" min="0" step="0.1" value="20" style="width:92px"></div>
+      <button class="ghost" onclick="setClipMark('clipend')" title="Take current player position">⌖ from player</button>
+      <div class="field"><label>Extra formats</label>
+        <div style="display:flex;gap:12px;padding:9px 0">
+          <label class="hint"><input type="checkbox" class="clipfmt" value="9:16"> 9:16</label>
+          <label class="hint"><input type="checkbox" class="clipfmt" value="1:1"> 1:1</label>
+          <label class="hint"><input type="checkbox" class="clipfmt" value="4:5"> 4:5</label>
+          <label class="hint"><input type="checkbox" class="clipfmt" value="16:9"> 16:9</label>
+        </div></div>
+      <button class="btn" id="clipgo" onclick="makeClip()">Create clip</button>
+    </div>
+    <div class="hint" style="margin-top:6px">Cuts run locally on the server: no render costs. Clips land in My videos and can be published to the blog.</div>
+    <div id="clipresult" style="margin-top:10px"></div>
+  </div>
+  </details>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>(s==null?"":(""+s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function boot(){
+  let me; try{ const r=await fetch('/api/me'); if(!r.ok){location.href='/login';return;} me=await r.json(); window._me=me; }
+  catch(e){ location.href='/login'; return; }
+  $('#who').textContent='signed in as '+me.username;
+  const sel=$('#preset');
+  sel.innerHTML=(me.avatars||[]).length ? me.avatars.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('')
+    : '<option value="">— no avatars yet —</option>';
+  $('#go').disabled=!(me.avatars&&me.avatars.length);
+  $('#fpreset').innerHTML=sel.innerHTML;
+  if(me.avatars&&me.avatars.length){
+    $('#fpreset').onchange=()=>loadFramingFor($('#fpreset').value);
+    $('#fzoom').oninput=updateFramingPreview; $('#fy').oninput=updateFramingPreview;
+    $('#sectFraming').addEventListener('toggle',function(){
+      if(this.open && !this._loaded){ this._loaded=true; loadFramingFor($('#fpreset').value); }
+    });
+  }
+  if(me.role==='admin'){ $('#autargetwrap').style.display=''; loadAdminUsers(); $('#newsrefresh').style.display=''; }
+  loadNewsroom();
+  loadVideos();
+  loadBranding();
+  loadVoices();
+  loadBackgrounds();
+  wireLookPreview();
+  ['lipsync','bg'].forEach(id=>{ const el=$('#'+id); if(el) el.addEventListener('change',estDur); });
+  $('#preset').addEventListener('change',loadTone); loadTone();
+  $('#preset').addEventListener('change',updateAvatarPreview); updateAvatarPreview();
+  loadStyles();
+  loadHistory();
+  loadUsage();
+  const sg=$('#sectGoals'); if(sg){ sg.addEventListener('toggle',function(){ if(this.open) loadGoals(); }); }
+  const sb=$('#sectBlog'); if(sb){ sb.addEventListener('toggle',function(){ if(this.open){ loadPosts(); loadSite(); } }); }
+  const sp=$('#sectProfiles'); if(sp){ sp.addEventListener('toggle',function(){ if(this.open) loadProfiles(); }); }
+  const sr=$('#sectReviews'); if(sr){ sr.addEventListener('toggle',function(){ if(this.open) loadReviews(); }); }
+  loadSite();
+}
+const _PLAT_LABEL={facebook:'Facebook',instagram:'Instagram',youtube:'YouTube',tiktok:'TikTok'};
+// ---- Media check (Konstruktiv-Score for other media) ----
+let _reviews=[];
+function scoreChip(k){ if(!k||k.score==null) return '<span class="hint">–</span>'; const c=k.score>=60?'var(--good,#2f8f6f)':(k.score>=40?'#c27c1a':'#9b4a4a');
+  return `<span title="${esc(k.kurz||'')}" style="display:inline-block;padding:2px 9px;border-radius:999px;background:${c};color:#fff;font-weight:700;font-size:12px">${k.score}</span>`; }
+function reviewCard(r){ const k=r.konstruktiv||{};
+  return `<div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${scoreChip(k)}<span class="hint" style="text-transform:uppercase;letter-spacing:.05em">${esc(r.domain||'')}</span>
+      <a href="${esc(r.url)}" target="_blank" rel="noopener"><b>${esc(r.titel||r.url)}</b></a></div>
+    <div class="hint" style="margin:6px 0">${k.loesung?'✓':'✗'} Lösung · ${k.belege?'✓':'✗'} Belege · ${k.grenzen?'✓':'✗'} Grenzen · Ton: ${esc(k.ton||'–')}</div>
+    <div style="font-size:13.5px"><b>${esc(k.kurz||'')}</b>${k.erlaeuterung?`<div style="margin-top:4px">${esc(k.erlaeuterung)}</div>`:''}</div>
+    <div style="display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap">
+      <label class="hint"><input type="checkbox" ${r.approved?'checked':''} onchange="reviewApprove('${esc(r.id)}',this.checked)"> show on the site</label>
+      <a href="#" class="hint" onclick="reviewDelete('${esc(r.id)}');return false">delete</a>
+      <span class="hint">${esc((r.checked||r.added||'').slice(0,10))} · ${esc(r.autor||'')}</span></div></div>`; }
+async function loadReviews(){
+  const box=$('#rv_list'); if(!box) return;
+  try{ const j=await (await fetch('/api/reviews')).json(); _reviews=j.reviews||[]; }catch(e){ box.innerHTML='<div class="empty err">Error loading.</div>'; return; }
+  const n=_reviews.filter(r=>r.approved).length; const rc=$('#rvcount'); if(rc) rc.textContent=_reviews.length?`${_reviews.length} checked · ${n} on the site`:'Konstruktiv-Score for articles of other media';
+  box.innerHTML=_reviews.length?_reviews.map(reviewCard).join(''):'<div class="empty">No articles checked yet.</div>';
+}
+async function reviewCheck(url){
+  url=url||$('#rv_url').value.trim(); const b=$('#rv_go'), h=$('#rv_hint');
+  if(!url){ h.textContent='Paste a link first.'; return; }
+  b.disabled=true; b.textContent='Reading & scoring …'; h.textContent='';
+  try{ const r=await fetch('/api/reviews/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.detail||'Error');
+    $('#rv_result').innerHTML=reviewCard(j.review); $('#rv_url').value=''; loadReviews();
+  }catch(e){ h.textContent=e.message; }
+  b.disabled=false; b.textContent='Check';
+}
+async function reviewApprove(id,on){ await fetch('/api/reviews/'+encodeURIComponent(id),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({approved:on})}); loadReviews(); }
+async function reviewDelete(id){ if(!confirm('Delete this check?')) return; await fetch('/api/reviews/'+encodeURIComponent(id),{method:'DELETE'}); $('#rv_result').innerHTML=''; loadReviews(); }
+async function rescorePost(id,el){ el.textContent='scoring …';
+  const r=await fetch('/api/blog/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+  const j=await r.json().catch(()=>({})); if(!r.ok) el.textContent=j.detail||'Error'; else loadPosts(); }
+// ---- Avatar profiles (team page) ----
+let _profiles=[];
+async function loadProfiles(){
+  const box=$('#proflist'); if(!box) return;
+  if(!_site) await loadSite();
+  try{ const j=await (await fetch('/api/profiles')).json(); _profiles=j.profiles||[]; }catch(e){ box.innerHTML='<div class="empty err">Error loading.</div>'; return; }
+  const pc=$('#profcount'); if(pc) pc.textContent=_profiles.length?`${_profiles.length} profile${_profiles.length===1?'':'s'}`:'Team page on the site: photo, bio, ressorts';
+  if(!_profiles.length){ box.innerHTML='<div class="empty">No profiles yet. Click “+ New profile”.</div>'; return; }
+  box.innerHTML=`<div class="gwrap"><table class="gt"><tr><th></th><th>Name</th><th>Ressorts</th><th>Avatars</th><th>Visible</th><th></th></tr>`
+    +_profiles.map(p=>`<tr><td>${p.photo?`<img src="/news/media/avatar/${esc(p.slug)}.jpg?${Date.now()}" style="width:36px;height:36px;border-radius:50%;object-fit:cover">`:'<span class="hint">no photo</span>'}</td>
+      <td class="t"><a href="#" onclick="window.open(siteBase()+'/team/${esc(p.slug)}');return false">${esc(p.name)}</a><div class="hint">${esc(p.kurz||'')}</div></td>
+      <td>${esc((p.ressorts||[]).join(', ')||'–')}</td><td>${esc((p.persona_avatare||[]).join(', ')||'–')}</td><td>${p.sichtbar===false?'no':'yes'}</td>
+      <td style="text-align:right;white-space:nowrap"><a href="#" onclick="editProfile('${esc(p.slug)}');return false">Edit</a> · <a href="#" onclick="deleteProfile('${esc(p.slug)}');return false">Delete</a></td></tr>`).join('')+'</table></div>';
+}
+function profileFormFill(p){
+  const my=(window._me&&window._me.avatars)||[];
+  $('#pr_ressorts').innerHTML=((_site&&_site.ressorts)||[]).map(r=>`<label class="hint"><input type="checkbox" class="pr_r" value="${esc(r)}" ${(p.ressorts||[]).includes(r)?'checked':''}> ${esc(r)}</label>`).join('');
+  $('#pr_avatars').innerHTML=my.map(a=>`<label class="hint"><input type="checkbox" class="pr_a" value="${esc(a)}" ${(p.persona_avatare||[]).includes(a)?'checked':''}> ${esc(a)}</label>`).join('')||'<span class="hint">(no avatars in your account)</span>';
+  $('#pr_avatars_extra').value=(p.persona_avatare||[]).filter(a=>!my.includes(a)).join(', ');
+  $('#pr_still').innerHTML=my.map(a=>`<option>${esc(a)}</option>`).join('');
+  $('#pr_slug').value=p.slug||''; $('#pr_name').value=p.name||''; $('#pr_kurz').value=p.kurz||''; $('#pr_text').value=p.text||'';
+  $('#pr_order').value=p.order||0; $('#pr_visible').checked=p.sichtbar!==false;
+  $('#pr_photorow').style.display=p.slug?'':'none'; $('#pr_hint').textContent=p.slug?'':'Save first, then add a photo.'; $('#pr_phint').textContent='';
+  $('#profform').style.display=''; $('#pr_name').focus();
+}
+function newProfile(){ profileFormFill({}); }
+function editProfile(slug){ const p=_profiles.find(x=>x.slug===slug); if(p) profileFormFill(p); }
+function profileBody(){
+  return {slug:$('#pr_slug').value,name:$('#pr_name').value.trim(),kurz:$('#pr_kurz').value.trim(),text:$('#pr_text').value,
+    ressorts:[...document.querySelectorAll('.pr_r:checked')].map(c=>c.value),
+    persona_avatare:[...document.querySelectorAll('.pr_a:checked')].map(c=>c.value).concat($('#pr_avatars_extra').value.split(',').map(s=>s.trim()).filter(Boolean)),
+    order:parseInt($('#pr_order').value)||0,sichtbar:$('#pr_visible').checked};
+}
+async function saveProfile(){
+  const h=$('#pr_hint'), body=profileBody();
+  if(!body.name){ h.textContent='Name is required.'; return; }
+  try{ const r=await fetch('/api/profiles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){ h.textContent=j.detail||'Error'; return; }
+    $('#pr_slug').value=j.slug; $('#pr_photorow').style.display=''; h.innerHTML=`Saved ✓ <a href="#" onclick="window.open(siteBase()+'/team/${esc(j.slug)}');return false">open ↗</a> · now add a photo below`;
+    loadProfiles();
+  }catch(e){ h.textContent='Error'; }
+}
+async function profilePhotoUpload(){
+  const f=$('#pr_file').files[0], h=$('#pr_phint'), slug=$('#pr_slug').value;
+  if(!slug){ h.textContent='Save the profile first.'; return; } if(!f){ h.textContent='Choose an image first.'; return; }
+  h.textContent='Uploading …';
+  const fd=new FormData(); fd.append('slug',slug); fd.append('file',f);
+  const r=await fetch('/api/profiles/photo',{method:'POST',body:fd}); const j=await r.json().catch(()=>({}));
+  h.textContent=r.ok?'Photo saved ✓':(j.detail||'Error'); if(r.ok) loadProfiles();
+}
+async function profilePhotoStill(){
+  const h=$('#pr_phint'), slug=$('#pr_slug').value, preset=$('#pr_still').value;
+  if(!slug){ h.textContent='Save the profile first.'; return; } if(!preset){ h.textContent='No avatar selected.'; return; }
+  h.textContent='Extracting still …';
+  const r=await fetch('/api/profiles/photo-from-avatar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug,preset})});
+  const j=await r.json().catch(()=>({})); h.textContent=r.ok?'Photo saved ✓':(j.detail||'Error'); if(r.ok) loadProfiles();
+}
+async function deleteProfile(slug){
+  if(!confirm('Delete this profile from the team page?')) return;
+  const r=await fetch('/api/profiles/'+encodeURIComponent(slug),{method:'DELETE'});
+  if(r.ok) loadProfiles(); else $('#profhint').textContent='Could not delete.';
+}
+// ---- Blog posts (editor) ----
+let _posts=[], _site=null;
+async function loadSite(){
+  try{ _site=await (await fetch('/api/site')).json(); window._site=_site; }catch(e){ _site=null; }
+  const sel=$('#pf_ressort'); if(sel&&_site){ const cur=sel.value;
+    sel.innerHTML='<option value="">— none —</option>'+(_site.ressorts||[]).map(r=>`<option>${esc(r)}</option>`).join('');
+    if([...sel.options].some(o=>o.value===cur)) sel.value=cur; }
+  const ss=$('#sitesettings');
+  if(ss&&_site&&window._me&&window._me.role==='admin'){
+    ss.style.display=''; $('#ss_name').value=_site.name||''; $('#ss_claim').value=_site.claim||'';
+    $('#ss_domain').value=_site.domain||''; $('#ss_ressorts').value=(_site.ressorts||[]).join('\n');
+    $('#ss_about').value=_site.about||''; $('#ss_index').checked=!!_site.indexable; $('#ss_scores').checked=_site.show_scores!==false; $('#ss_gsv').value=_site.google_verification||''; }
+}
+async function saveSite(){
+  const h=$('#ss_hint');
+  const body={name:$('#ss_name').value,claim:$('#ss_claim').value,domain:$('#ss_domain').value,
+    ressorts:$('#ss_ressorts').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    about:$('#ss_about').value,indexable:$('#ss_index').checked,show_scores:$('#ss_scores').checked,google_verification:$('#ss_gsv').value.trim()};
+  try{ const r=await fetch('/api/site',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({})); h.textContent=r.ok?'Saved ✓ (live immediately)':(j.detail||'Error'); if(r.ok) loadSite();
+  }catch(e){ h.textContent='Error'; }
+  setTimeout(()=>h.textContent='',4000);
+}
+function openSect(id){ const s=$('#'+id); if(s){ s.open=true; s.scrollIntoView({behavior:'smooth',block:'start'}); } }
+async function loadPosts(){
+  const box=$('#postlist'); if(!box) return;
+  try{ const j=await (await fetch('/api/blog/posts')).json(); _posts=j.posts||[]; }catch(e){ box.innerHTML='<div class="empty err">Error loading.</div>'; return; }
+  const bc=$('#blogcount'); if(bc) bc.textContent=_posts.length?`${_posts.length} post${_posts.length===1?'':'s'} on /news`:'Write, edit, publish on /news';
+  if(!_posts.length){ box.innerHTML='<div class="empty">No posts yet. Click “New post”, or publish a video from My videos.</div>'; return; }
+  box.innerHTML=`<div class="gwrap"><table class="gt"><tr><th>Date</th><th>Title</th><th>Ressort</th><th>Video</th><th>Score</th><th>Author</th><th></th></tr>`
+    +_posts.map(p=>`<tr><td>${esc((p.published_at||'').slice(0,10))}</td><td class="t"><a href="/news/${esc(p.id)}" target="_blank">${esc(p.titel)}</a>${p.teaser?'':' <span class="hint">(no teaser)</span>'}</td><td>${esc(p.ressort||'–')}</td><td>${p.video?(p.w>p.h?'16:9':'9:16'):'–'}</td><td>${scoreChip(p.konstruktiv)} ${p.mine?`<a href="#" class="hint" onclick="rescorePost('${esc(p.id)}',this);return false">↻</a>`:''}</td><td>${esc(p.autor||'')}</td>
+      <td style="text-align:right;white-space:nowrap">${p.mine?`<a href="#" onclick="editPost('${esc(p.id)}');return false">Edit</a> · <a href="#" onclick="deletePost('${esc(p.id)}');return false">Delete</a>`:''}</td></tr>`).join('')+'</table></div>';
+}
+function fillPostVideos(){
+  const sel=$('#pf_video'); if(!sel) return;
+  sel.innerHTML='<option value="">— keep current / none —</option>'+_videos.map(v=>`<option value="${esc(v.file)}">${v.title?esc(v.title):esc(v.file)}</option>`).join('');
+}
+function newPost(){
+  fillPostVideos();
+  ['pf_id','pf_titel','pf_teaser','pf_text','pf_quellen','pf_social'].forEach(id=>$('#'+id).value='');
+  $('#pf_ressort').value=''; $('#pf_video').value=''; $('#pf_rm').checked=false; $('#pf_rmwrap').style.display='none';
+  $('#pf_save').textContent='Save & publish'; $('#pf_hint').textContent='';
+  $('#postform').style.display=''; $('#pf_titel').focus();
+}
+async function editPost(id){
+  if(!_posts.length) await loadPosts();
+  const p=_posts.find(x=>x.id===id); if(!p){ $('#bloghint').textContent='Post not found.'; return; }
+  fillPostVideos();
+  $('#pf_id').value=p.id; $('#pf_titel').value=p.titel||''; $('#pf_teaser').value=p.teaser||'';
+  $('#pf_text').value=p.text||''; $('#pf_ressort').value=p.ressort||''; $('#pf_video').value='';
+  $('#pf_quellen').value=(p.quellen||[]).join('\n'); $('#pf_rm').checked=false;
+  $('#pf_social').value=(p.social||[]).map(s=>s.label?`${s.label} | ${s.url}`:s.url).join('\n');
+  $('#pf_rmwrap').style.display=p.video?'':'none';
+  $('#pf_save').textContent='Save changes'; $('#pf_hint').textContent='';
+  $('#postform').style.display=''; $('#pf_titel').focus();
+}
+async function postUpload(){
+  const f=$('#pf_file').files[0], b=$('#pf_upbtn'), h=$('#pf_uphint');
+  if(!f){ h.textContent='Choose a video file first.'; return; }
+  b.disabled=true; b.textContent='Uploading …'; h.textContent='Uploading and converting, this can take a minute for long videos …';
+  try{
+    const fd=new FormData(); fd.append('file',f); fd.append('title',$('#pf_titel').value.trim());
+    const r=await fetch('/api/videos/upload',{method:'POST',body:fd});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.detail||'Upload failed');
+    await loadVideos(); fillPostVideos(); $('#pf_video').value=j.file;
+    h.textContent=`✓ Uploaded (${Math.round(j.seconds||0)} s). It is selected above; save to publish.`;
+  }catch(e){ h.textContent=e.message; }
+  b.disabled=false; b.textContent='Upload';
+}
+async function savePost(){
+  const b=$('#pf_save'), h=$('#pf_hint');
+  const body={id:$('#pf_id').value,titel:$('#pf_titel').value.trim(),teaser:$('#pf_teaser').value.trim(),
+    text:$('#pf_text').value,ressort:$('#pf_ressort').value,video:$('#pf_video').value,remove_video:$('#pf_rm').checked,
+    quellen:$('#pf_quellen').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    social_links:$('#pf_social').value.split('\n').map(s=>s.trim()).filter(Boolean)};
+  if(!body.titel){ h.textContent='Title is required.'; return; }
+  b.disabled=true; if(body.social_links.length) h.textContent='Saving … fetching social previews, this can take a few seconds.';
+  try{ const r=await fetch('/api/blog/post',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok){ h.innerHTML=`Published ✓ <a href="${esc(j.url)}" target="_blank">open ↗</a>`; $('#postform').style.display='none'; loadPosts(); loadVideos(); }
+    else h.textContent=j.detail||'Error';
+  }catch(e){ h.textContent='Error'; }
+  b.disabled=false;
+}
+async function deletePost(id){
+  if(!confirm('Remove this post from /news?')) return;
+  const r=await fetch('/api/blog/unpublish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({file:id})});
+  if(r.ok){ loadPosts(); loadVideos(); } else $('#bloghint').textContent='Could not delete.';
+}
+async function loadGoals(){
+  let g; try{ g=await (await fetch('/api/goals?weeks=8')).json(); }catch(e){ $('#goals').innerHTML='<div class="empty err">Error loading.</div>'; return; }
+  const k=g.konstruktiv||{};
+  const pct=(a,b)=>b?Math.round(100*a/b)+' %':'–';
+  const kpi=`<div class="kpi">
+    <div><b>${(g.weeks||[]).reduce((s,w)=>s+w.visits,0)}</b><span>visits · 8 wk</span></div>
+    <div><b>${(g.weeks||[]).reduce((s,w)=>s+w.plays,0)}</b><span>video plays</span></div>
+    <div><b>${pct((g.weeks||[]).reduce((s,w)=>s+w.p100,0),(g.weeks||[]).reduce((s,w)=>s+w.plays,0))}</b><span>watched to end</span></div>
+    <div><b>${(g.weeks||[]).reduce((s,w)=>s+w.mut,0)}</b><span>💛 “macht mir Mut”</span></div>
+  </div>`;
+  const wk=(g.weeks||[]).length?`<div class="gh">Blog · per week</div><div class="gwrap"><table class="gt"><tr><th>Week</th><th>Visits</th><th>Plays</th><th>≥50 %</th><th>100 %</th><th>🤔</th><th>💛</th><th>📣</th></tr>`
+    +g.weeks.map(w=>`<tr><td>${esc(w.week)}</td><td>${w.visits}</td><td>${w.plays}</td><td>${w.p50}</td><td>${w.p100}</td><td>${w.neu}</td><td>${w.mut}</td><td>${w.teilen}</td></tr>`).join('')+'</table></div>':'<div class="hint" style="margin-top:8px">No blog visits recorded yet.</div>';
+  const plats=Object.entries(g.platforms||{}).sort((a,b)=>b[1]-a[1]);
+  const src=plats.length?`<div class="gh">Where visits come from</div><div class="hint">${plats.map(([p,n])=>{
+      const accts=Object.entries(g.sources||{}).filter(([s])=>s!==p&&s.startsWith(p+'-')).sort((a,b)=>b[1]-a[1])
+        .map(([s,m])=>`${esc(s.slice(p.length+1))} ${m}`).join(', ');
+      return `${esc(_PLAT_LABEL[p]||p)}: <b>${n}</b>${accts?` <span style="opacity:.7">(${accts})</span>`:''}`;}).join(' · ')}</div>`:'';
+  const posts=(g.posts||[]).length?`<div class="gh">Blog · per post</div><div class="gwrap"><table class="gt"><tr><th>Post</th><th>Ressort</th><th>Avatar</th><th>Seen</th><th>Plays</th><th>To end</th><th>🤔</th><th>💛</th><th>📣</th></tr>`
+    +g.posts.map(p=>`<tr><td class="t">${esc(p.titel)}</td><td>${esc(p.ressort||'–')}</td><td>${esc(p.avatar||'–')}</td><td>${p.seen}</td><td>${p.plays}</td><td>${pct(p.p100,p.plays)}</td><td>${p.neu}</td><td>${p.mut}</td><td>${p.teilen}</td></tr>`).join('')+'</table></div>':'';
+  $('#goals').innerHTML=kpi+wk+src+posts;
+  loadMeta(); loadStats();
+  if(!$('#swweek').value) $('#swweek').value=g.current_week||'';
+  const so=g.social||[];
+  $('#socialtbl').innerHTML=so.length?`<div class="gwrap"><table class="gt"><tr><th>Week</th><th>Platform</th><th>Reach</th><th>Views</th><th>Followers</th><th>Shares</th><th>Positive</th><th>Angry</th><th>Positive share</th></tr>`
+    +so.map(r=>`<tr><td>${esc(r.week)}</td><td>${esc(_PLAT_LABEL[r.platform]||r.platform)}</td><td>${r.reach}</td><td>${r.views}</td><td>${r.followers}</td><td>${r.shares}</td><td>${r.pos}</td><td>${r.neg}</td><td>${pct(r.pos,(r.pos+r.neg))}</td></tr>`).join('')+'</table></div>':'<div class="hint" style="margin-top:8px">No social numbers yet. Enter the first week above.</div>';
+}
+async function loadMeta(){
+  const box=$('#metabox'); if(!box) return;
+  let m; try{ m=await (await fetch('/api/goals/meta?weeks=8')).json(); }catch(e){ box.innerHTML='<div class="empty err">Error loading Facebook data.</div>'; return; }
+  const isAdmin=(window._me&&window._me.role==='admin');
+  const btn=isAdmin?` <button class="ghost" onclick="metaRefresh(this)" style="padding:6px 10px;font-size:12px">↻ Fetch now</button>`:'';
+  if(!m.configured){
+    box.innerHTML=`<div class="hint">Facebook is not connected yet. Once the page tokens are in place (data/meta_pages.json on the server), numbers are fetched daily at 05:00 UTC.${btn}</div>`; return; }
+  const lr=m.status&&m.status.last_run;
+  const st=`<div class="hint">Last fetch: ${lr?esc(lr.at.replace('T',' ').slice(0,16))+' UTC · '+(lr.ok?'ok':'with errors')+' · '+esc(lr.note||''):'never'}${btn}</div>`;
+  const fmt=v=>v==null?'–':v.toLocaleString('de-CH');
+  const wk=(m.weeks||[]).length?`<div class="gwrap"><table class="gt"><tr><th>Week</th><th>Page</th><th>Views</th><th>Ø daily viewers</th><th>Video views</th><th>Engagements</th><th>Followers</th><th>± Followers</th></tr>`
+    +m.weeks.map(w=>`<tr><td>${esc(w.week)}</td><td>${esc(w.page)}</td><td>${fmt(w.views)}</td><td>${fmt(w.viewers_avg)}</td><td>${fmt(w.video_views)}</td><td>${fmt(w.engagements)}</td><td>${fmt(w.follows)}</td><td>${w.follows_net>0?'+':''}${fmt(w.follows_net)}</td></tr>`).join('')+'</table></div>'
+    :'<div class="hint" style="margin-top:6px">No page data fetched yet.</div>';
+  const tp=(m.top_posts||[]).length?`<div class="gh">Facebook · top posts (8 weeks)</div><div class="gwrap"><table class="gt"><tr><th>Date</th><th>Page</th><th>Type</th><th>Post</th><th>Views</th><th>Positive</th><th>Angry</th><th>Clicks</th></tr>`
+    +m.top_posts.map(p=>`<tr><td>${esc(p.created)}</td><td>${esc(p.page)}</td><td>${esc(p.kind)}</td><td class="t">${p.permalink?`<a href="${esc(p.permalink)}" target="_blank" rel="noopener">${esc((p.message||'(no text)').slice(0,80))}</a>`:esc((p.message||'(no text)').slice(0,80))}</td><td>${fmt(p.views)}</td><td>${fmt(p.pos)}</td><td>${fmt(p.neg)}</td><td>${fmt(p.clicks)}</td></tr>`).join('')+'</table></div>':'';
+  box.innerHTML=st+wk+tp;
+}
+async function metaRefresh(b){
+  b.disabled=true; const t=b.textContent; b.textContent='Fetching …';
+  try{ const r=await fetch('/api/goals/meta/refresh',{method:'POST'}); const j=await r.json().catch(()=>({}));
+    if(!r.ok){ alert(j.detail||'Error'); } else { setTimeout(loadMeta,20000); }
+  }catch(e){}
+  setTimeout(()=>{ b.disabled=false; b.textContent=t; },20000);
+}
+// ---- Screenshot statistics by e-mail ----
+const _ML={reach:'Reach',views:'Views',followers:'Followers',follower_change:'± Followers',likes:'Likes',comments:'Comments',shares:'Shares',saves:'Saves',impressions:'Impressions',watch_time_min:'Watch time (min)',profile_visits:'Profile visits',posts:'Posts',engagement:'Engagement'};
+async function loadStats(){
+  const sb=$('#st_senders'), ib=$('#st_inbox'); if(!sb) return;
+  try{ const j=await (await fetch('/api/stats/senders')).json();
+    $('#st_addr').textContent=j.address||'(mailbox not configured)';
+    sb.innerHTML=(j.senders||[]).length?'Registered: '+j.senders.map(s=>`${esc(s.name||s.email)} <span style="opacity:.7">(${esc(s.email)}${s.platform?' · '+esc(s.platform):''}${s.konto?' · '+esc(s.konto):''})</span> <a href="#" onclick="delSender('${esc(s.email)}');return false">✕</a>`).join(' · '):'No senders registered yet.';
+  }catch(e){ sb.textContent='Error loading senders.'; }
+  try{ const j=await (await fetch('/api/stats/inbox?weeks=8')).json(); const it=j.items||[];
+    if(!it.length){ ib.innerHTML='<div class="hint">No screenshots received yet.</div>'; return; }
+    ib.innerHTML=it.map(r=>{ const vals=(r.values||[]);
+      const vhtml=vals.map(v=>`<label class="hint" style="display:inline-flex;align-items:center;gap:4px;margin:2px 8px 2px 0">${esc(_ML[v.metric]||v.metric)} <input type="number" data-m="${esc(v.metric)}" value="${v.value}" style="width:96px;padding:3px 6px;${v.sure?'':'border-color:#c27c1a'}" ${r.status==='ok'?'disabled':''}></label>`).join('');
+      const st=r.status==='ok'?'<span style="color:var(--good,#2f8f6f);font-weight:600">✓ confirmed</span>':r.status==='rejected'?'<span style="opacity:.6">rejected</span>':r.status==='error'?`<span class="err">error: ${esc(r.error||'')}</span>`:'<span style="color:#c27c1a;font-weight:600">please check</span>';
+      return `<div id="st_${r.id}" style="display:flex;gap:12px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;align-items:flex-start">
+        <a href="/api/stats/image/${esc(r.image)}" target="_blank"><img src="/api/stats/image/${esc(r.image)}" style="width:84px;max-height:150px;object-fit:cover;border-radius:8px;background:#ddd"></a>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(r.name||r.sender)}</b><span class="hint">${esc((r.received||'').slice(0,16).replace('T',' '))}</span>${st}</div>
+          <div class="row" style="margin:6px 0;align-items:center;gap:8px">
+            <input class="st_plat" value="${esc(r.platform||'')}" placeholder="platform" style="width:100px;padding:3px 6px" ${r.status==='ok'?'disabled':''}>
+            <input class="st_konto" value="${esc(r.konto||'')}" placeholder="account" style="width:120px;padding:3px 6px" ${r.status==='ok'?'disabled':''}>
+            <input class="st_week" value="${esc(r.week||'')}" placeholder="2026-W39" style="width:96px;padding:3px 6px" ${r.status==='ok'?'disabled':''}>
+            <span class="hint">${esc(r.period_text||'')}</span></div>
+          <div>${vhtml||'<span class="hint">no numbers recognised</span>'}</div>
+          ${r.hinweis?`<div class="hint" style="margin-top:4px">Note: ${esc(r.hinweis)}</div>`:''}
+          ${r.status!=='ok'&&r.status!=='error'?`<div style="margin-top:6px;display:flex;gap:10px"><button class="ghost" style="padding:4px 10px;font-size:12px" onclick="statsSet(${r.id},'ok')">Confirm</button><button class="ghost" style="padding:4px 10px;font-size:12px" onclick="statsSet(${r.id},'rejected')">Reject</button></div>`:''}
+        </div></div>`; }).join('');
+  }catch(e){ ib.innerHTML='<div class="empty err">Error loading inbox.</div>'; }
+}
+async function saveSender(){
+  const h=$('#st_hint'); const body={email:$('#st_email').value.trim(),name:$('#st_name').value.trim(),platform:$('#st_plat').value,konto:$('#st_konto').value.trim()};
+  if(!body.email){ h.textContent='E-mail is required.'; return; }
+  const r=await fetch('/api/stats/senders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({}));
+  h.textContent=r.ok?'Registered ✓':(j.detail||'Error'); if(r.ok){ $('#st_email').value=''; $('#st_name').value=''; $('#st_konto').value=''; loadStats(); }
+  setTimeout(()=>h.textContent='',3000);
+}
+async function delSender(em){ if(!confirm('Remove this sender?')) return; await fetch('/api/stats/senders/'+encodeURIComponent(em),{method:'DELETE'}); loadStats(); }
+async function statsPull(b){
+  b.disabled=true; const t=b.textContent; b.textContent='Fetching …'; const h=$('#st_hint');
+  try{ const r=await fetch('/api/stats/pull',{method:'POST'}); const j=await r.json().catch(()=>({}));
+    h.textContent=r.ok?`Checked ${j.checked}, processed ${j.processed}, unknown senders ${j.skipped_unknown}, errors ${j.errors}`:(j.detail||'Error'); if(r.ok) loadStats();
+  }catch(e){ h.textContent='Error'; }
+  b.disabled=false; b.textContent=t; setTimeout(()=>h.textContent='',8000);
+}
+async function statsSet(id,status){
+  const box=$('#st_'+id); const values={}; box.querySelectorAll('input[data-m]').forEach(i=>{ if(i.value!=='') values[i.dataset.m]=parseFloat(i.value); });
+  const body={status,week:box.querySelector('.st_week').value.trim(),platform:box.querySelector('.st_plat').value.trim(),konto:box.querySelector('.st_konto').value.trim(),values};
+  const r=await fetch('/api/stats/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({}));
+  if(!r.ok) alert(j.detail||'Error'); loadStats(); if(status==='ok') loadGoals();
+}
+async function saveSocial(){
+  const body={week:$('#swweek').value.trim(),platform:$('#swplat').value,
+    reach:+$('#swreach').value||0,views:+$('#swviews').value||0,followers:+$('#swfol').value||0,
+    shares:+$('#swsh').value||0,pos:+$('#swpos').value||0,neg:+$('#swneg').value||0};
+  const h=$('#swhint');
+  try{ const r=await fetch('/api/goals/social',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    h.textContent=r.ok?'Saved ✓':(j.detail||'Error'); if(r.ok) loadGoals();
+  }catch(e){ h.textContent='Error'; }
+  setTimeout(()=>h.textContent='',3000);
+}
+async function loadTone(){
+  const p=$('#preset').value; if(!p){ return; }
+  try{ const s=await (await fetch('/api/framing?preset='+encodeURIComponent(p))).json();
+    $('#tone').value = s.tone||'';
+    const b=+(s.brightness||0);   // gespeicherte Standard-Helligkeit des Avatars
+    $('#brt').value=b; $('#brtv').textContent=(b>0?'+':'')+b.toFixed(2);
+    if($('#lookprev')&&$('#lookprev').open) updateLookPreview();
+  }catch(e){}
+}
+
+async function loadUsage(){
+  try{ const j=await (await fetch('/api/usage')).json();
+    $('#usagesub').textContent = j.total ? `${j.total} videos · ~$${j.total_cost.toFixed(2)}` : 'no videos yet';
+    const tile=(label,val,accent)=>`<div style="background:var(--panel2);border:1px solid var(--line-2);border-radius:11px;padding:12px 15px;min-width:140px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)">${label}</div>
+      <div style="font-size:19px;font-family:var(--serif);margin-top:4px;color:${accent||'var(--ink)'}">${val}</div></div>`;
+    const lim=j.limit||0;
+    const mcol = lim&&j.month_cost>=lim ? 'var(--danger)' : (lim&&j.month_cost>=lim*0.8 ? 'var(--gold-deep)' : null);
+    let html=`<div style="display:flex;flex-wrap:wrap;gap:10px">`
+      + tile('This month', `${j.month_count} · ~$${j.month_cost.toFixed(2)}${lim?' / $'+lim.toFixed(0):''}`, mcol)
+      + tile('All time', `${j.total} · ~$${j.total_cost.toFixed(2)}`)
+      + tile('Saved by cache', `~$${j.total_saved.toFixed(2)}`, 'var(--good)')
+      + `</div>`;
+    if((j.recent||[]).length){
+      html+=`<div class="hint" style="margin:14px 0 6px">Recent</div><div style="display:flex;flex-direction:column;gap:4px">`
+        + j.recent.map(r=>`<div style="display:flex;gap:12px;font-size:12.5px;color:var(--muted)">
+            <span style="min-width:120px">${new Date(r.at).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span>
+            <span style="min-width:110px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.title||'—')}</span>
+            <span style="min-width:40px">${r.dur}s</span>
+            <span style="min-width:78px">${esc(r.model)}${r.bg?' · bg':''}</span>
+            <span style="color:${r.cached?'var(--good)':'var(--muted)'}">${r.cached?'♻ $0':'~$'+(r.est||0).toFixed(2)}</span></div>`).join('')
+        + `</div>`;
+    }
+    html+=`<div class="hint" style="margin-top:12px;opacity:.7">Estimates from length + model. Exact spend is on your Replicate / ElevenLabs dashboards.</div>`;
+    $('#usage').innerHTML=html;
+  }catch(e){ $('#usage').innerHTML='<div class="empty err">Error loading.</div>'; }
+}
+
+let _ownBgs=[];
+async function loadBackgrounds(){
+  try{ const j=await (await fetch('/api/backgrounds')).json(); _ownBgs=j.own||[];
+    const opts=(j.backgrounds||[]).map(b=>`<option value="${esc(b.id)}">${esc(b.label)}</option>`).join('');
+    const own=_ownBgs.map(n=>`<option value="u:${esc(n)}">${esc(n)}</option>`).join('');
+    const cur=$('#bg').value;
+    $('#bg').innerHTML='<option value="none">Original (keep)</option>'+opts
+      +(own?`<optgroup label="My backgrounds">${own}</optgroup>`:'');
+    if(cur && $('#bg').querySelector(`option[value="${CSS.escape(cur)}"]`)) $('#bg').value=cur;
+    const box=$('#mybgs');
+    if(box) box.innerHTML=_ownBgs.map(n=>`<span class="chip" style="display:inline-flex;gap:6px;align-items:center">${esc(n)}
+      <a onclick="delBg('${esc(n)}')" style="cursor:pointer;color:var(--danger)">✕</a></span>`).join('')||'<span class="hint">No own backgrounds yet.</span>';
+  }catch(e){}
+}
+async function genBg(){
+  const name=$('#bgname').value.trim(), prompt=$('#bgprompt').value.trim(), h=$('#bghint');
+  if(!name||!prompt){ h.textContent='Enter a description and a name.'; return; }
+  const b=$('#bggen'); b.disabled=true; const t=b.textContent; b.textContent='Generating … (~20 s)';
+  try{
+    const r=await fetch('/api/backgrounds/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,prompt})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok){ h.textContent=`✓ "${name}" created — now selectable under Background.`; $('#bgprompt').value=''; $('#bgname').value=''; await loadBackgrounds(); $('#bg').value='u:'+name; lookPreviewMaybe(); estDur(); }
+    else h.textContent=j.detail||'Generation failed.';
+  }catch(e){ h.textContent='Generation failed.'; }
+  b.disabled=false; b.textContent=t;
+}
+async function upBg(){
+  const f=$('#bgfile').files[0], h=$('#bghint');
+  if(!f){ h.textContent='Choose an image file first.'; return; }
+  const name=($('#bgname').value.trim()||f.name.replace(/\.[^.]+$/,'')).slice(0,40);
+  const fd=new FormData(); fd.append('name',name); fd.append('file',f);
+  try{
+    const r=await fetch('/api/backgrounds/upload',{method:'POST',body:fd});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok){ h.textContent=`✓ "${name}" uploaded.`; $('#bgfile').value=''; await loadBackgrounds(); $('#bg').value='u:'+name; lookPreviewMaybe(); estDur(); }
+    else h.textContent=j.detail||'Upload failed.';
+  }catch(e){ h.textContent='Upload failed.'; }
+}
+async function delBg(name){
+  await fetch('/api/backgrounds/'+encodeURIComponent(name),{method:'DELETE'});
+  if($('#bg').value==='u:'+name) $('#bg').value='none';
+  loadBackgrounds();
+}
+
+function updateAvatarPreview(){
+  const p=$('#preset').value, img=$('#avprev');
+  if(!p){ img.style.display='none'; return; }
+  img.onload=()=>{ img.style.display=''; };
+  img.onerror=()=>{ img.style.display='none'; };
+  // Standbild im gespeicherten Framing, ohne Look/Vignette — zeigt den Avatar selbst
+  img.src='/api/look/preview?'+new URLSearchParams({preset:p,look:'none',vignette:0,
+    contrast:0,warmth:0,brightness:0,background:'none',t:2}).toString();
+}
+let _lprevTimer=null;
+function updateLookPreview(){
+  const preset=$('#preset').value; if(!preset){ return; }
+  clearTimeout(_lprevTimer);
+  _lprevTimer=setTimeout(()=>{
+    const bg=$('#bg').value;
+    const q=new URLSearchParams({preset,look:$('#look').value,
+      vignette:$('#vig').value,contrast:$('#con').value,warmth:$('#war').value,
+      brightness:$('#brt').value,background:bg,t:2,_:Date.now()});
+    const img=$('#lprev'), hint=$('#lprevhint');
+    if(bg!=='none') hint.textContent='Rendering with background (first time per avatar ~5 s) …';
+    img.onload=()=>{ hint.textContent = bg!=='none'
+      ? 'Background preview — the final video uses this.'
+      : 'Still frame from your avatar with the current color settings.'; };
+    img.src='/api/look/preview?'+q.toString();
+  },220);
+}
+function lookPreviewMaybe(){ if($('#lookprev').open) updateLookPreview(); }
+function wireLookPreview(){
+  const ids=new Set(['preset','look','vig','con','war','brt','bg']);
+  const box=document.querySelector('.box');
+  ['input','change'].forEach(ev=>box.addEventListener(ev,e=>{ if(ids.has(e.target.id)) lookPreviewMaybe(); }));
+  $('#lookprev').addEventListener('toggle',function(){ if(this.open) updateLookPreview(); });
+}
+
+const _voicePrev={};
+async function loadVoices(){
+  let list=[], own=[];
+  try{ const j=await (await fetch('/api/voices')).json(); list=j.voices||[]; own=j.own||[]; }catch(e){ return; }
+  const groups={female:[],male:[],other:[]};
+  list.forEach(v=>{ (groups[v.gender==='female'?'female':v.gender==='male'?'male':'other']).push(v);
+    if(v.preview_url) _voicePrev[v.voice_id]=v.preview_url; });
+  const opt=v=>{ const bits=[v.accent,v.age&&v.age.replace('_',' ')].filter(Boolean).join(', ');
+    return `<option value="${esc(v.voice_id)}">${esc(v.name)}${bits?' · '+esc(bits):''}</option>`; };
+  const grp=(label,arr)=>arr.length?`<optgroup label="${label}">${arr.map(opt).join('')}</optgroup>`:'';
+  const ownOpts=own.length?`<optgroup label="My voices (cloned)">${own.map(v=>`<option value="${esc(v.voice_id)}">${esc(v.name)}</option>`).join('')}</optgroup>`:'';
+  $('#voice').innerHTML='<option value="">Avatar voice (cloned)</option>' + ownOpts
+    + grp('Female voices',groups.female) + grp('Male voices',groups.male) + grp('Other',groups.other);
+}
+function onVoiceChange(){
+  previewStop();
+  $('#voiceplay').style.display = _voicePrev[$('#voice').value] ? '' : 'none';
+}
+function previewStop(){ const a=$('#voiceaudio'); a.pause(); $('#voiceplay').textContent='▶'; }
+function previewVoice(){
+  const a=$('#voiceaudio'), url=_voicePrev[$('#voice').value];
+  if(!url) return;
+  if(!a.paused && a.dataset.url===url){ previewStop(); return; }
+  a.src=url; a.dataset.url=url; a.play(); $('#voiceplay').textContent='◼';
+  a.onended=()=>$('#voiceplay').textContent='▶';
+}
+
+async function loadAdminUsers(){
+  try{ const j=await (await fetch('/api/admin/users')).json();
+    $('#autarget').innerHTML=(j.users||[]).map(u=>`<option value="${esc(u.username)}">${esc(u.username)}</option>`).join('');
+  }catch(e){}
+}
+async function uploadAvatar(){
+  const name=$('#auname').value.trim(), f=$('#aufile').files[0];
+  if(!name||!f){ $('#auhint').textContent='Choose a name and video.'; return; }
+  if(!$('#auconsent').checked){ $('#auhint').textContent='Please confirm you have the right to use this person’s face and voice.'; return; }
+  const b=$('#aubtn'); b.disabled=true; b.textContent='Cloning voice …';
+  $('#auhint').textContent='Uploading and cloning the voice … (up to ~30 s, please wait)';
+  const fd=new FormData(); fd.append('name',name); fd.append('file',f); fd.append('consent','true');
+  let url='/api/avatar';
+  const tw=$('#autargetwrap');
+  if(tw && tw.style.display!=='none'){ fd.append('target',$('#autarget').value); url='/api/admin/avatar'; }
+  try{
+    const r=await fetch(url,{method:'POST',body:fd}); const j=await r.json();
+    b.disabled=false; b.textContent='Upload + clone voice';
+    if(r.ok){
+      $('#auhint').textContent=`✓ Avatar "${esc(j.name)}" created for "${esc(j.user)}".`;
+      $('#auname').value=''; $('#aufile').value='';
+      const self=$('#who').textContent.replace('signed in as ','');
+      if(j.user===self) setTimeout(()=>location.reload(),900);
+    } else { $('#auhint').textContent=j.detail||'Upload error'; }
+  }catch(e){ b.disabled=false; b.textContent='Upload + clone voice'; $('#auhint').textContent='Error: '+e.message; }
+}
+
+function fparams(){ return {preset:$('#fpreset').value, zoom:$('#fzoom').value, y_frac:$('#fy').value}; }
+let _fprevTimer=null;
+function updateFramingPreview(){
+  const p=fparams(); if(!p.preset) return;
+  $('#fzoomv').textContent=parseFloat(p.zoom).toFixed(2);
+  $('#fyv').textContent=parseFloat(p.y_frac).toFixed(2);
+  clearTimeout(_fprevTimer);
+  _fprevTimer=setTimeout(()=>{ $('#fprev').src=`/api/framing/preview?preset=${encodeURIComponent(p.preset)}&zoom=${p.zoom}&y_frac=${p.y_frac}&t=2&_=${Date.now()}`; },180);
+}
+async function loadFramingFor(preset){
+  try{ const s=await (await fetch('/api/framing?preset='+encodeURIComponent(preset))).json();
+    $('#fzoom').value=s.zoom; $('#fy').value=s.y_frac;
+  }catch(e){}
+  updateFramingPreview();
+}
+async function saveFraming(){
+  const p=fparams();
+  const r=await fetch('/api/framing',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({preset:p.preset,zoom:parseFloat(p.zoom),y_frac:parseFloat(p.y_frac)})});
+  $('#fhint').textContent = r.ok ? 'Saved ✓ — applies to new videos of this avatar.'
+    : ((await r.json().catch(()=>({}))).detail || 'Error saving');
+}
+
+async function loadBranding(){
+  try{ const b=await (await fetch('/api/branding')).json();
+    $('#bname').value=b.name||''; $('#btitle').value=b.title||'';
+    $('#baccent').value='#'+(b.accent||'e9b96a');
+    $('#bsec').value=String(b.lowerthird_seconds ?? 4);
+    $('#bpos').value=b.logo_pos||'tr';
+    setLogoPreview(!!b.has_logo);
+  }catch(e){}
+}
+function setLogoPreview(has){
+  const img=$('#blogoprev'), del=$('#blogodel');
+  if(has){ img.src='/api/branding/logo?t='+Date.now(); img.style.display=''; del.style.display=''; }
+  else { img.style.display='none'; del.style.display='none'; }
+}
+async function saveBranding(){
+  const body={name:$('#bname').value,title:$('#btitle').value,
+    accent:$('#baccent').value.replace('#',''),logo_pos:$('#bpos').value,
+    lowerthird_seconds:parseFloat($('#bsec').value)};
+  const r=await fetch('/api/branding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  $('#bhint').textContent = r.ok ? 'Saved ✓' : ((await r.json().catch(()=>({}))).detail || 'Error saving');
+}
+async function uploadLogo(){
+  const f=$('#blogo').files[0]; if(!f) return;
+  $('#bhint').textContent='Uploading logo …';
+  const fd=new FormData(); fd.append('file',f);
+  const r=await fetch('/api/branding/logo',{method:'POST',body:fd});
+  if(r.ok){ setLogoPreview(true); $('#bhint').textContent='Logo uploaded ✓'; }
+  else { $('#bhint').textContent=(await r.json().catch(()=>({}))).detail || 'Logo error'; }
+  $('#blogo').value='';
+}
+async function deleteLogo(){
+  await fetch('/api/branding/logo',{method:'DELETE'});
+  setLogoPreview(false); $('#bhint').textContent='Logo removed';
+}
+function estDur(){
+  const t=$('#text').value.trim();
+  const words=t?t.split(/\s+/).length:0;
+  const secs=Math.round(words/2.3);   // grobe Schaetzung ~2.3 Woerter/Sek.
+  const h=$('#durhint');
+  if(!words){ h.textContent=''; return; }
+  const rate = ($('#lipsync')&&$('#lipsync').value==='premium') ? 0.083 : 0.05;
+  let cost = secs*rate + 0.05;                        // Lippensync + Stimme
+  if($('#bg')&&$('#bg').value!=='none') cost += 0.15; // Freistellen (Matting)
+  const long=secs>30;
+  h.innerHTML=`~${secs}s of speech (${words} words) · est. cost <b>~$${cost.toFixed(2)}</b> `
+    +`<span style="opacity:.65">(fresh render; ~$0 if the lip-sync is reused from cache)</span>`
+    +(long?' — long video: rendered in parts.':'');
+  h.style.color = long ? 'var(--gold-deep)' : 'var(--muted)';
+}
+async function suggestScript(){
+  const el=$('#text'), b=$('#suggest'), h=$('#durhint');
+  const inp=el.value.trim();
+  if(!inp){ h.textContent='Write a few bullet points first, then click Suggest.'; h.style.color='var(--danger)'; return; }
+  b.disabled=true; const t=b.textContent; b.textContent='Writing …';
+  const secs=parseInt($('#scriptsecs').value)||null;
+  try{
+    const r=await fetch('/api/script',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:inp,seconds:secs,tone:$('#tone').value,preset:$('#preset').value,lang:$('#lang').value})});
+    const j=await r.json();
+    if(r.ok && j.script){ el.value=j.script; estDur(); }
+    else { h.textContent=j.detail||'Script assistant failed.'; h.style.color='var(--danger)'; }
+  }catch(e){ h.textContent='Script assistant error.'; h.style.color='var(--danger)'; }
+  b.disabled=false; b.textContent=t;
+}
+let _styles={};
+function collectStyle(){
+  return {look:$('#look').value, lipsync:$('#lipsync').value, background:$('#bg').value,
+    captions:$('#cap').value==='on', cap_style:$('#capstyle').value, cap_y:parseFloat($('#capy').value),
+    cap_size:$('#capsize').value, vignette:parseFloat($('#vig').value), speed:parseFloat($('#spd').value),
+    pause_every:parseInt($('#pauses').value), contrast:parseFloat($('#con').value),
+    warmth:parseFloat($('#war').value), brightness:parseFloat($('#brt').value),
+    branding:$('#brand').value==='on'};
+}
+function applyStyle(){
+  const s=_styles[$('#style').value]; if(!s) return;
+  const set=(id,v)=>{ if(v!==undefined&&v!==null) $('#'+id).value=v; };
+  const pm=v=>(v>0?'+':'')+(+v).toFixed(2);
+  set('look',s.look); set('lipsync',s.lipsync); set('bg',s.background);
+  if(s.captions!==undefined) $('#cap').value=s.captions?'on':'off';
+  set('capstyle',s.cap_style); set('capsize',s.cap_size);
+  if(s.cap_y!==undefined){ $('#capy').value=s.cap_y; $('#capyv').textContent=(+s.cap_y).toFixed(2); }
+  if(s.vignette!==undefined){ $('#vig').value=s.vignette; $('#vigv').textContent=(+s.vignette).toFixed(2); }
+  if(s.speed!==undefined){ $('#spd').value=s.speed; $('#spdv').textContent=(+s.speed).toFixed(2)+'×'; }
+  if(s.pause_every!==undefined) $('#pauses').value=String(s.pause_every);
+  if(s.contrast!==undefined){ $('#con').value=s.contrast; $('#conv').textContent=pm(s.contrast); }
+  if(s.warmth!==undefined){ $('#war').value=s.warmth; $('#warv').textContent=pm(s.warmth); }
+  if(s.brightness!==undefined){ $('#brt').value=s.brightness; $('#brtv').textContent=pm(s.brightness); }
+  if(s.branding!==undefined) $('#brand').value=s.branding?'on':'off';
+  estDur(); lookPreviewMaybe();
+}
+async function loadStyles(sel){
+  try{ const j=await (await fetch('/api/styles')).json(); _styles=j.styles||{};
+    $('#style').innerHTML='<option value="">— none —</option>'
+      +Object.keys(_styles).map(n=>`<option value="${esc(n)}"${n===sel?' selected':''}>${esc(n)}</option>`).join('');
+  }catch(e){}
+}
+async function saveStyle(){
+  const name=prompt('Name for this style template:', $('#style').value||'');
+  if(!name||!name.trim()) return;
+  const r=await fetch('/api/styles',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:name.trim(),settings:collectStyle()})});
+  const h=$('#stylehint');
+  if(r.ok){ await loadStyles(name.trim()); h.textContent='Saved ✓'; }
+  else h.textContent=(await r.json().catch(()=>({}))).detail||'Error saving.';
+  setTimeout(()=>h.textContent='',3000);
+}
+async function deleteStyle(){
+  const n=$('#style').value; if(!n) return;
+  await fetch('/api/styles/'+encodeURIComponent(n),{method:'DELETE'});
+  await loadStyles(); $('#stylehint').textContent='Deleted.';
+  setTimeout(()=>$('#stylehint').textContent='',3000);
+}
+async function changePassword(){
+  const cur=$('#pwcur').value, nw=$('#pwnew').value, h=$('#pwhint');
+  if(!cur||!nw){ h.textContent='Fill in both fields.'; h.className='hint err'; return; }
+  try{
+    const fd=new FormData(); fd.append('current',cur); fd.append('new',nw);
+    const r=await fetch('/api/password',{method:'POST',body:fd});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok){ h.textContent='Password changed ✓'; h.className='hint'; $('#pwcur').value=''; $('#pwnew').value=''; }
+    else { h.textContent=j.detail||'Error changing password.'; h.className='hint err'; }
+  }catch(e){ h.textContent='Error changing password.'; h.className='hint err'; }
+}
+let _hist=[];
+async function loadHistory(){
+  try{ const j=await (await fetch('/api/scripts')).json(); _hist=j.scripts||[];
+    const lab=r=>{ const d=new Date(r.at).toLocaleDateString([],{day:'2-digit',month:'short'});
+      const t=(r.title||r.text||'').replace(/\s+/g,' ').slice(0,34); return `${d} · ${t}${(r.title||r.text||'').length>34?'…':''}`; };
+    $('#hist').innerHTML='<option value="">↺ History'+(_hist.length?` (${_hist.length})`:'')+'</option>'
+      +_hist.map((r,i)=>`<option value="${i}">${esc(lab(r))}</option>`).join('');
+  }catch(e){}
+}
+function restoreScript(){
+  const r=_hist[+$('#hist').value]; $('#hist').value='';
+  if(!r) return;
+  $('#text').value=r.text||''; if(r.title) $('#vtitle').value=r.title;
+  if(r.lang && $('#lang').querySelector(`option[value="${r.lang}"]`)) $('#lang').value=r.lang;
+  estDur();
+}
+let _news=null;
+async function loadNewsroom(){
+  loadTicker();
+  try{ const j=await (await fetch('/api/newsroom')).json(); _news=j;
+    const t=j.topics||[];
+    $('#newssub').textContent = t.length ? `${t.length} topics · ${j.date||''}` : 'no scan yet';
+    if(!t.length){ $('#news').innerHTML='<div class="empty">No topics yet — the daily scan runs every morning.</div>'; return; }
+    $('#news').innerHTML=t.map((x,i)=>`<div style="border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--panel2)">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="chip on" style="margin:0">${esc(x.category)}</span><b>${esc(x.headline)}</b></div>
+      <ul style="margin:8px 0 6px 18px;padding:0;font-size:13.5px">${(x.bullets||[]).map(b=>`<li>${esc(b)}</li>`).join('')}</ul>
+      ${x.angle?`<div class="hint" style="margin-bottom:8px">↗ ${esc(x.angle)}</div>`:''}
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="ghost" onclick="useTopic(${i})" style="padding:5px 10px;font-size:12px">→ Use as notes</button>
+        <button class="ghost" onclick="addTickerTopic(${i},this)" style="padding:5px 10px;font-size:12px" title="Show this headline in the ticker on the site">+ Ticker</button>
+        <span class="hint">${(x.sources||[]).map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener" style="color:var(--muted)">${esc((s.title||'source').slice(0,42))}</a> <a href="#" title="Konstruktiv-Score for this article (Media check)" onclick="openSect('sectReviews');reviewCheck('${esc(s.url)}');return false" style="color:var(--muted)">⚖</a>`).join(' · ')}</span>
+      </div></div>`).join('');
+  }catch(e){ $('#news').innerHTML='<div class="empty err">Error loading.</div>'; }
+}
+// ---- Live ticker (site) ----
+let _ticker=null;
+async function loadTicker(){
+  try{ _ticker=await (await fetch('/api/ticker')).json(); }catch(e){ return; }
+  $('#tk_auto').checked=!!_ticker.auto;
+  const items=_ticker.items||[];
+  const manual=new Set(items.map(i=>(i.text||'').toLowerCase()));
+  const row=(text,url,action)=>`<div style="display:flex;gap:8px;align-items:center;padding:3px 0"><span>• ${esc(text)}</span>${url?`<a href="${esc(url)}" target="_blank" rel="noopener" style="color:var(--muted)">↗</a>`:''}${action}</div>`;
+  let html=items.map(i=>row(i.text,i.url,`<a href="#" onclick="removeTicker('${esc(i.id)}');return false" style="color:var(--muted)" title="Remove your line">✕</a>`)).join('');
+  if(_ticker.auto){
+    const auto=(_ticker.visible||[]).filter(v=>!manual.has((v.text||'').toLowerCase()));
+    html+=`<div style="margin-top:6px;color:var(--muted)">From the scan${_ticker.scan_date?' of '+esc(_ticker.scan_date):''} (auto):</div>`;
+    html+=auto.map(v=>row(v.text,v.url,`<a href="#" onclick="hideTicker('${esc(v.text).replace(/'/g,'&#39;')}',true);return false" style="color:var(--muted)" title="Hide this headline for today">✕</a>`)).join('');
+    const hid=_ticker.hidden||[];
+    if(hid.length) html+=`<div style="margin-top:4px">Hidden: ${hid.map(h=>`<span>${esc(h)} <a href="#" onclick="hideTicker('${esc(h).replace(/'/g,'&#39;')}',false);return false" style="color:var(--muted)" title="Show again">↺</a></span>`).join(' · ')}</div>`;
+  }
+  html+=`<div style="margin-top:4px">${(_ticker.visible||[]).length} line(s) visible on the site · your own lines expire after ${_ticker.max_age_hours} h${_ticker.auto?' · scan headlines change with every new scan':''}</div>`;
+  $('#tk_list').innerHTML=html||`No approved lines yet. Use “+ Ticker” on a topic below or add your own line.`;
+}
+async function hideTicker(text,hide){
+  const r=await fetch('/api/ticker/hide',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,hide})});
+  $('#tk_hint').textContent=r.ok?'Saved ✓':'Error'; setTimeout(()=>$('#tk_hint').textContent='',2500); loadTicker();
+}
+async function saveTicker(){
+  if(!_ticker) return;
+  const body={auto:$('#tk_auto').checked,max_age_hours:_ticker.max_age_hours||24,items:_ticker.items||[],hidden:_ticker.hidden||[]};
+  const r=await fetch('/api/ticker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  $('#tk_hint').textContent=r.ok?'Saved ✓':'Error'; setTimeout(()=>$('#tk_hint').textContent='',2500); loadTicker();
+}
+async function addTicker(text,url,btn){
+  const r=await fetch('/api/ticker/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,url})});
+  const j=await r.json().catch(()=>({}));
+  if(btn){ btn.textContent=r.ok?(j.duplicate?'already in ticker':'✓ in ticker'):'Error'; btn.disabled=true; }
+  $('#tk_hint').textContent=r.ok?'Saved ✓':(j.detail||'Error'); setTimeout(()=>$('#tk_hint').textContent='',2500); loadTicker();
+}
+function addTickerTopic(i,btn){
+  const x=((_news&&_news.topics)||[])[i]; if(!x) return;
+  const s=(x.sources||[])[0]; addTicker(x.headline||'', s&&s.url?s.url:'', btn);
+}
+function addTickerManual(){
+  const t=$('#tk_text').value.trim(); if(!t){ $('#tk_hint').textContent='Text is required.'; return; }
+  addTicker(t,$('#tk_url').value.trim(),null); $('#tk_text').value=''; $('#tk_url').value='';
+}
+async function removeTicker(id){
+  if(!_ticker) return; _ticker.items=(_ticker.items||[]).filter(i=>i.id!==id); saveTicker();
+}
+function useTopic(i){
+  const x=((_news&&_news.topics)||[])[i]; if(!x) return;
+  $('#text').value=(x.bullets||[]).map(b=>'- '+b).join('\n')+(x.angle?'\n- Dreh: '+x.angle:'');
+  $('#vtitle').value=x.headline||''; estDur();
+  $('#text').scrollIntoView({behavior:'smooth',block:'center'}); $('#text').focus();
+  $('#durhint').textContent='Notes inserted — now click "✨ Suggest from notes".'; $('#durhint').style.color='var(--gold-deep)';
+}
+async function refreshNewsroom(){
+  const b=$('#newsrefresh'); b.disabled=true; const t=b.textContent; b.textContent='Scanning … (~1 min)';
+  try{ const r=await fetch('/api/newsroom/refresh',{method:'POST'}); const j=await r.json().catch(()=>({}));
+    $('#newshint').textContent = r.ok ? `Scanned ${j.scanned} items → ${j.topics} topics` : (j.detail||'Scan failed.');
+    if(r.ok) loadNewsroom();
+  }catch(e){ $('#newshint').textContent='Scan failed.'; }
+  b.disabled=false; b.textContent=t;
+}
+async function translateScript(){
+  const el=$('#text'), b=$('#translate'), h=$('#durhint');
+  const txt=el.value.trim();
+  if(!txt){ h.textContent='Write or suggest a script first, then translate.'; h.style.color='var(--danger)'; return; }
+  b.disabled=true; const t=b.textContent; b.textContent='Translating …';
+  try{
+    const r=await fetch('/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt,lang:$('#lang').value})});
+    const j=await r.json();
+    if(r.ok && j.script){ el.value=j.script; estDur(); }
+    else { h.textContent=j.detail||'Translation failed.'; h.style.color='var(--danger)'; }
+  }catch(e){ h.textContent='Translation error.'; h.style.color='var(--danger)'; }
+  b.disabled=false; b.textContent=t;
+}
+async function logout(){ await fetch('/api/logout',{method:'POST'}); location.href='/login'; }
+
+async function create(){
+  const preset=$('#preset').value, text=$('#text').value.trim();
+  if(!preset||!text){ $('#result').innerHTML='<div class="empty err">Choose an avatar and enter text.</div>'; return; }
+  const b=$('#go'); b.disabled=true; b.textContent='Running …';
+  const steps=['Voice','Base','Lip sync','Enhance','Subtitles'];
+  const draw=s=>{ $('#result').innerHTML='<div class="box"><div><span class="spin"></span> '+
+    steps.map((n,i)=>`<span class="chip ${i<s?'on':''}">${i+1}. ${n}</span>`).join('')+
+    '</div><div class="hint" style="margin-top:8px">Generating video … 3–5 minutes.</div></div>'; };
+  draw(0);
+  const body={text,preset,title:$('#vtitle').value.trim(),ressort:$('#ressort').value,lang:$('#lang').value,look:$('#look').value,lipsync:$('#lipsync').value,captions:$('#cap').value==='on',
+    cap_style:$('#capstyle').value,cap_y:parseFloat($('#capy').value),cap_size:$('#capsize').value,
+    branding:$('#brand').value==='on', ai_label:$('#ailabel').value==='on',
+    pause_every:parseInt($('#pauses').value),
+    vignette:parseFloat($('#vig').value),speed:parseFloat($('#spd').value),
+    voice:$('#voice').value,
+    contrast:parseFloat($('#con').value),warmth:parseFloat($('#war').value),
+    brightness:parseFloat($('#brt').value),
+    background:$('#bg').value};
+  let r; try{ r=await (await fetch('/api/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json(); }
+  catch(e){ $('#result').innerHTML=`<div class="empty err">${esc(e.message)}</div>`; b.disabled=false; b.textContent='Create video'; return; }
+  if(!r.job_id){ $('#result').innerHTML=`<div class="empty err">${esc(r.detail||'Error')}</div>`; b.disabled=false; b.textContent='Create video'; return; }
+  const drawQueue=p=>{ $('#result').innerHTML='<div class="box"><div><span class="spin"></span> '+
+    'In queue — position '+p+'</div><div class="hint" style="margin-top:8px">Your video starts as soon as it\'s your turn. You can keep this window open.</div></div>'; };
+  const poll=setInterval(async()=>{
+    let s; try{ s=await (await fetch('/api/status/'+r.job_id)).json(); }catch(e){ return; }
+    if(s.queued){ drawQueue(s.position||1); return; }
+    if(s.running){ draw(s.step||0); return; }
+    clearInterval(poll); b.disabled=false; b.textContent='Create video';
+    if(s.ok){ $('#result').innerHTML=`<div class="clip"><video src="${esc(s.url)}" controls preload="metadata"></video>
+      <div>${s.title?`<div style="font-weight:600;margin-bottom:4px">${esc(s.title)}</div>`:''}<div class="chip on">Avatar: ${esc(s.preset)}</div>
+      <div style="margin:8px 0">✓ Done.${s.lip_cached?' <span class="chip on" style="background:var(--good);border-color:var(--good);color:#0c1c10">♻ lip-sync from cache · $0</span>':''}</div>
+      <a class="dl" href="${esc(s.url)}" download="${esc(dlName(s.title,s.file))}">Download</a></div></div>`; loadVideos(); loadUsage(); loadHistory(); }
+    else{ $('#result').innerHTML=`<div class="empty err">${esc(s.error||'Failed.')}</div>`; }
+  },3000);
+}
+
+let _videos=[];
+function fmtTs(ts){ try{ return new Date(ts*1000).toLocaleString([],
+  {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+function dlName(title,file){ const t=(title||'').trim().replace(/[\\/:*?"<>|]+/g,'').slice(0,60);
+  return t ? t+'.mp4' : file; }
+// Every video download also fetches the companion .json (Newsroom uploader metadata),
+// saved under the same base name. Older videos without a sidecar are skipped silently.
+async function dlSidecar(mp4Url, base){
+  try{
+    const r=await fetch(mp4Url.replace(/\.mp4$/,'.json'));
+    if(!r.ok) return;
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(await r.blob());
+    a.download=base+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  }catch(e){}
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest ? e.target.closest('a.dl') : null;
+  if(!a) return;
+  const href=a.getAttribute('href')||'';
+  if(!href.endsWith('.mp4')) return;
+  const base=(a.getAttribute('download')||href.split('/').pop()||'').replace(/\.mp4$/,'');
+  if(base) dlSidecar(href,base);
+});
+let _pubset=new Set();
+async function loadVideos(){
+  try{ const p=await fetch('/api/blog/mine'); const pj=await p.json();
+    _pubset=new Set(pj.published||[]); }catch(e){}
+  try{ const r=await fetch('/api/videos'); const j=await r.json(); _videos=j.videos||[];
+    const box=$('#videos');
+    const vc=$('#vidcount'); if(vc) vc.textContent=_videos.length?_videos.length+(_videos.length===1?' clip':' clips'):'';
+    if(!_videos.length){ box.innerHTML='<div class="empty">No videos yet.</div>'; return; }
+    box.innerHTML=`<div class="row" style="align-items:center;gap:10px">
+        <div class="field"><select id="videosel"></select></div>
+        <a class="dl" id="videodl" download>⬇ Save</a>
+        <button class="ghost" id="videofmt">Formats</button>
+        <button class="ghost" id="videopub" onclick="publishToggle()">Publish</button>
+        <span class="hint" id="pubhint"></span></div>
+      <video id="videoplayer" controls preload="metadata"
+        style="width:190px;max-width:100%;border-radius:10px;background:#000;margin-top:12px;display:block"></video>
+      <div id="videofmts" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>`;
+    $('#videosel').innerHTML=_videos.map((v,i)=>`<option value="${i}">${v.title?esc(v.title)+' · ':''}${fmtTs(v.ts)} · ${v.size_mb} MB</option>`).join('');
+    $('#videosel').onchange=showVideo;
+    $('#videofmt').onclick=()=>makeFormats(_videos[+$('#videosel').value].file,$('#videofmt'));
+    showVideo();
+  }catch(e){ $('#videos').innerHTML='<div class="empty err">Error loading.</div>'; }
+  fillClipSources();
+}
+let _clipsrcs=[];
+async function fillClipSources(){
+  try{ const j=await (await fetch('/api/clip/sources')).json(); _clipsrcs=j.sources||[]; }catch(e){ _clipsrcs=[]; }
+  const sel=$('#clipsrc'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— choose a source —</option>'
+    +(_clipsrcs.length?'<optgroup label="Uploaded recordings">'+_clipsrcs.map(s=>
+      `<option value="src:${esc(s.name)}">${esc(s.name)} · ${Math.round(s.seconds)}s · ${s.size_mb} MB</option>`).join('')+'</optgroup>':'')
+    +(_videos.length?'<optgroup label="My videos">'+_videos.map(v=>
+      `<option value="out:${esc(v.file)}">${v.title?esc(v.title):esc(v.file)}</option>`).join('')+'</optgroup>':'');
+  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+}
+function clipSrcChange(){
+  const v=$('#clipsrc').value, pl=$('#clipplayer');
+  if(!v){ pl.style.display='none'; pl.removeAttribute('src'); return; }
+  const [kind,...rest]=v.split(':'); const name=rest.join(':');
+  pl.src=kind==='out' ? '/media/'+encodeURIComponent(name) : '/api/clip/media/'+encodeURIComponent(name);
+  pl.style.display='block';
+}
+async function clipUpload(){
+  const f=$('#clipfile').files[0], b=$('#clipupbtn');
+  if(!f){ $('#clipresult').innerHTML='<div class="empty err">Choose a file first.</div>'; return; }
+  b.disabled=true; b.textContent='Uploading …';
+  try{
+    const fd=new FormData(); fd.append('file',f);
+    const r=await fetch('/api/clip/upload',{method:'POST',body:fd});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.detail||'Upload failed');
+    await fillClipSources();
+    $('#clipsrc').value='src:'+j.name; clipSrcChange();
+    $('#clipresult').innerHTML='';
+  }catch(e){ $('#clipresult').innerHTML=`<div class="empty err">${esc(e.message)}</div>`; }
+  b.disabled=false; b.textContent='Upload';
+}
+function setClipMark(id){
+  const pl=$('#clipplayer');
+  if(pl.style.display==='none'||!pl.src) return;
+  $('#'+id).value=(pl.currentTime||0).toFixed(1);
+}
+async function makeClip(){
+  const src=$('#clipsrc').value, b=$('#clipgo');
+  const start=parseFloat($('#clipstart').value)||0, end=parseFloat($('#clipend').value)||0;
+  if(!src){ $('#clipresult').innerHTML='<div class="empty err">Choose a source.</div>'; return; }
+  if(end<=start){ $('#clipresult').innerHTML='<div class="empty err">End must be after start.</div>'; return; }
+  const formats=[...document.querySelectorAll('.clipfmt:checked')].map(c=>c.value);
+  b.disabled=true; b.textContent='Cutting …';
+  $('#clipresult').innerHTML='<div class="box"><span class="spin"></span> Cutting your clip …</div>';
+  try{
+    const r=await fetch('/api/clip',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({source:src,start,end,formats})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.detail||'Error');
+    const poll=setInterval(async()=>{
+      let s; try{ s=await (await fetch('/api/status/'+j.job_id)).json(); }catch(e){ return; }
+      if(s.running) return;
+      clearInterval(poll); b.disabled=false; b.textContent='Create clip';
+      if(s.ok){
+        const links=[`<a class="dl" href="${esc(s.url)}" download="${esc(s.file)}">Original ⬇</a>`]
+          .concat((s.variants||[]).map(v=>`<a class="dl" href="${esc(v.url)}" download="${esc(v.file)}">${esc(v.format)} ⬇</a>`));
+        $('#clipresult').innerHTML=`<div class="clip"><video src="${esc(s.url)}" controls preload="metadata" style="max-height:260px"></video>
+          <div><div style="margin:6px 0">✓ Done: ${(end-start).toFixed(1)} s clip.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${links.join('')}</div></div></div>`;
+        loadVideos();
+      } else $('#clipresult').innerHTML=`<div class="empty err">${esc(s.error||'Failed.')}</div>`;
+    },2000);
+  }catch(e){ $('#clipresult').innerHTML=`<div class="empty err">${esc(e.message)}</div>`; b.disabled=false; b.textContent='Create clip'; }
+}
+function showVideo(){
+  const v=_videos[+$('#videosel').value]; if(!v) return;
+  $('#videoplayer').src=v.url;
+  const dl=$('#videodl'); dl.href=v.url; dl.setAttribute('download',dlName(v.title,v.file));
+  $('#videofmts').innerHTML='';
+  const stem=v.file.replace(/\.mp4$/,''), pub=_pubset.has(stem), pb=$('#videopub');
+  if(pb){ pb.textContent=pub?'✓ On blog · remove':'Publish'; }
+  const ph=$('#pubhint');
+  if(ph) ph.innerHTML=pub?`<a href="${esc(siteBase())}/${esc(stem)}" target="_blank">View on site ↗</a> · <a href="#" onclick="openSect('sectBlog');editPost('${esc(stem)}');return false">Edit text</a> · share link for
+    ${['facebook','instagram','youtube','tiktok'].map(p=>`<a href="#" onclick="return copyShare('${esc(stem)}','${p}',this)" title="Copy link with source tag">${p==='facebook'?'FB':p==='instagram'?'IG':p==='youtube'?'YT':'TT'}</a>`).join(' ')}`:'';
+}
+function siteBase(){ return (window._site&&window._site.domain)?`https://${window._site.domain}`:`${location.origin}/news`; }
+function copyShare(stem,plat,el){
+  const url=`${siteBase()}/${stem}?utm_source=${plat}`;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>{ const t=el.textContent; el.textContent='copied ✓'; setTimeout(()=>el.textContent=t,1500); })
+    .catch(()=>prompt('Copy this link:',url));
+  return false;
+}
+async function publishToggle(){
+  const v=_videos[+$('#videosel').value]; if(!v) return;
+  const stem=v.file.replace(/\.mp4$/,''), pub=_pubset.has(stem), b=$('#videopub');
+  b.disabled=true;
+  try{
+    const r=await fetch(pub?'/api/blog/unpublish':'/api/blog/publish',
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({file:v.file})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok){ pub?_pubset.delete(stem):_pubset.add(stem); loadPosts(); }
+    else{ $('#pubhint').textContent=j.detail||'Error'; b.disabled=false; return; }
+  }catch(e){ $('#pubhint').textContent='Error'; }
+  b.disabled=false; showVideo();
+}
+async function makeFormats(file, btn){
+  btn.disabled=true; const t=btn.textContent; btn.textContent='Working …';
+  const box=$('#videofmts');
+  try{
+    const r=await fetch('/api/reframe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({file})});
+    const j=await r.json();
+    box.innerHTML=(j.variants||[]).length
+      ? j.variants.map(v=>`<a class="dl" href="${esc(v.url)}" download="${esc(v.file)}">${esc(v.format)} ⬇</a>`).join('')
+      : '<span class="hint err">Failed</span>';
+  }catch(e){ box.innerHTML='<span class="hint err">Error</span>'; }
+  btn.disabled=false; btn.textContent=t;
+}
+boot();
+</script>
+</body>
+</html>

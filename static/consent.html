@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Persona · Einwilligung / Consent</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{--bg:#100f12;--surface:#1a181e;--line:#2c2831;--line-2:#3a3540;--ink:#f3ede2;--muted:#a89f95;--faint:#756d66;
+    --gold:#e9b96a;--gold-bright:#f4cd86;--gold-deep:#c89441;--danger:#ea7c63;--ok:#8fcf9a;
+    --serif:"Georgia","Iowan Old Style",ui-serif,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6}
+  .wrap{width:min(820px,92vw);margin:0 auto;padding:36px 0 70px}
+  a{color:var(--gold-bright);text-decoration:none} a:hover{text-decoration:underline}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .brand{font-family:var(--serif);font-weight:700;font-size:26px;letter-spacing:-.03em;color:var(--ink)} .brand .dot{color:var(--gold)}
+  .lang button{background:transparent;border:1px solid var(--line-2);color:var(--muted);border-radius:8px;padding:6px 12px;font-family:var(--mono);font-size:12px;cursor:pointer}
+  .lang button.on{color:var(--ink);border-color:var(--gold)}
+  h1{font-family:var(--serif);font-size:32px;margin:26px 0 6px;letter-spacing:-.02em;line-height:1.15}
+  h2{font-family:var(--serif);font-size:19px;margin:24px 0 8px}
+  p,li{color:var(--muted)} p{margin:0 0 10px} ul{margin:0 0 10px;padding-left:20px} b{color:var(--ink);font-weight:600}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .todo{background:#2a1f12;border:1px solid #6b4e22;color:#f4cd86;border-radius:10px;padding:10px 14px;font-size:13px;margin:14px 0}
+  mark{background:#3a2a10;color:#f4cd86;padding:0 4px;border-radius:4px}
+  .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:14px 0}
+  form{display:grid;gap:14px}
+  label.f{display:grid;gap:6px;font-size:13px;color:var(--muted)}
+  input[type=text],input[type=email],select{background:#141218;border:1px solid var(--line-2);color:var(--ink);border-radius:10px;padding:11px 13px;font-size:15px;font-family:inherit;width:100%}
+  input:focus,select:focus{outline:none;border-color:var(--gold)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px} @media (max-width:560px){.row{grid-template-columns:1fr}}
+  .chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);padding:8px 0;border-top:1px solid var(--line)}
+  .chk:first-of-type{border-top:0}
+  .chk input{width:18px;height:18px;margin-top:3px;accent-color:var(--gold);flex:none}
+  .chk .req{color:var(--gold-deep);font-family:var(--mono);font-size:10px;letter-spacing:.1em;margin-left:4px}
+  .radio{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);padding:6px 0}
+  .radio input{accent-color:var(--gold);margin-top:4px}
+  .btn{display:inline-block;border-radius:10px;padding:12px 18px;font-weight:700;font-size:15px;cursor:pointer;border:0;font-family:inherit}
+  .gold{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#231a08}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+  .btn[disabled]{opacity:.55}
+  .msg{min-height:20px;font-size:14px} .msg.err{color:var(--danger)} .msg.ok{color:var(--ok)}
+  .done{display:none;border-color:var(--gold-deep)}
+  .sig{display:none}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+  footer{color:var(--faint);font-size:13px;margin-top:36px;border-top:1px solid var(--line);padding-top:16px}
+  [data-l]{display:none} html[data-lang="de"] [data-l="de"]{display:revert} html[data-lang="en"] [data-l="en"]{display:revert}
+  @media print{
+    body{background:#fff;color:#000;font-size:12pt} .wrap{width:100%;padding:0}
+    p,li,.chk,.radio,label.f{color:#000} .box{border:1px solid #999;background:#fff} .meta,.faint{color:#555}
+    .lang,.noprint,.todo,nav{display:none !important} .sig{display:block;margin-top:28px}
+    .sig div{border-top:1px solid #000;width:300px;padding-top:4px;margin-top:40px;font-size:11pt}
+    input,select{border:1px solid #999;background:#fff;color:#000} a{color:#000}
+  }
+</style>
+</head>
+<body><div class="wrap">
+  <div class="top">
+    <a class="brand" href="/">Persona<span class="dot">.</span></a>
+    <div class="lang noprint"><button id="lde" class="on" type="button">DE</button> <button id="len" type="button">EN</button></div>
+  </div>
+
+  <!-- ===================== DEUTSCH ===================== -->
+  <div data-l="de">
+    <p class="meta">Einwilligungserklärung · Version <span class="ver">2026-08-21.1</span></p>
+    <h1>Einwilligung zur Erstellung und Nutzung meines digitalen Avatars (Gesicht und Stimme)</h1>
+    <p>Bitte lies diese Erklärung sorgfältig. Du kannst sie online abgeben oder ausdrucken und unterschreiben.</p>
+
+    <div class="box" id="txt-de">
+      <h2>1. Wer ist verantwortlich?</h2>
+      <p><b>Max Stadler</b>, Wartstrasse 17, 8400 Winterthur, Schweiz, E-Mail <a href="mailto:max@letstalk.team">max@letstalk.team</a> („Persona", „wir"). Angaben siehe <a href="/impressum">Impressum</a>.</p>
+
+      <h2>2. Worum geht es?</h2>
+      <p>Aus einem von mir bereitgestellten Video (mit Ton) werden erstellt: (a) ein <b>digitaler Avatar</b> meines Gesichts und (b) eine <b>synthetische Stimme</b>, die meiner Stimme nachempfunden ist (Stimmklon). Mit beidem können Videos erzeugt werden, in denen „ich" gesprochene Texte vortrage, die ich nicht selbst aufgenommen habe. Gesicht und Stimme sind <b>biometrische Daten</b> (Art. 9 DSGVO, Art. 5 lit. c revDSG). Ihre Verarbeitung erfolgt ausschließlich auf Grundlage dieser Einwilligung.</p>
+
+      <h2>3. Wofür dürfen Avatar und Stimme verwendet werden?</h2>
+      <p>Nur für Videos im unten gewählten Umfang (Abschnitt „Umfang"). Jedes Skript stammt von mir oder von der von mir benannten Organisation. Persona erstellt keine Inhalte mit meinem Avatar aus eigenem Antrieb und gibt Avatar oder Stimme nicht an Dritte weiter. Unzulässig sind in jedem Fall: täuschende, herabwürdigende, sexualisierte, rechtswidrige Inhalte und die Darstellung als „echte" Aufnahme.</p>
+
+      <h2>4. Wer verarbeitet die Daten?</h2>
+      <ul>
+        <li><b>Hetzner Online GmbH</b> (Deutschland): Speicherung und Verarbeitung auf unseren Servern</li>
+        <li><b>ElevenLabs Inc.</b> (USA): Stimmklon und Sprachsynthese</li>
+        <li><b>Replicate, Inc.</b> (USA): Lippensynchronisation, Freistellung, Transkription</li>
+        <li><b>Anthropic, PBC</b> (USA): Skript-Assistent (nur Text, keine Biometrie)</li>
+      </ul>
+      <p>Dabei werden Daten in die USA übermittelt (Standardvertragsklauseln bzw. EU-US Data Privacy Framework). Details in der <a href="/datenschutz">Datenschutzerklärung</a>.</p>
+
+      <h2>5. Kennzeichnung</h2>
+      <p>Alle mit meinem Avatar erzeugten Videos werden als <b>KI-generiert gekennzeichnet</b>: sichtbar im Bild und maschinenlesbar in der Videodatei (EU AI Act, Art. 50). Ich bin damit einverstanden.</p>
+
+      <h2>6. Dauer, Widerruf, Löschung</h2>
+      <p>Die Einwilligung gilt, bis ich sie widerrufe. Ich kann sie <b>jederzeit ohne Angabe von Gründen</b> per E-Mail an <a href="mailto:max@letstalk.team">max@letstalk.team</a> widerrufen. Nach Widerruf werden Quellvideo, Avatar und Stimmklon (auch beim Stimmdienstleister) sowie nicht veröffentlichte Videos innerhalb von <b>14 Tagen</b> gelöscht. Bereits veröffentlichte Videos kann Persona nicht zurückholen; deren Löschung liegt bei mir bzw. der veröffentlichenden Organisation. Der Nachweis dieser Einwilligung wird zu Dokumentationszwecken aufbewahrt (Art. 7 Abs. 1 DSGVO).</p>
+
+      <h2>7. Meine Rechte</h2>
+      <p>Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch, Beschwerde bei einer Aufsichtsbehörde. Die Einwilligung ist freiwillig; ohne sie kann kein Avatar erstellt werden, sonst entstehen mir keine Nachteile.</p>
+    </div>
+
+    <form id="f-de" class="noprint-form">
+      <h2>Meine Angaben</h2>
+      <div class="row">
+        <label class="f">Vor- und Nachname<input type="text" name="name" required maxlength="120" autocomplete="name"></label>
+        <label class="f">E-Mail<input type="email" name="email" required maxlength="200" autocomplete="email"></label>
+      </div>
+      <h2>Umfang</h2>
+      <label class="radio"><input type="radio" name="scope" value="self" checked><span><b>Nur ich selbst</b> erstelle oder beauftrage Videos mit meinem Avatar.</span></label>
+      <label class="radio"><input type="radio" name="scope" value="client"><span><b>Meine Organisation / mein Auftraggeber</b> darf Videos mit meinem Avatar erstellen lassen (Name unten).</span></label>
+      <label class="radio"><input type="radio" name="scope" value="persona"><span><b>Persona darf in meinem Auftrag</b> Videos aus von mir freigegebenen Texten erstellen („Done-for-you").</span></label>
+      <label class="f">Organisation / Auftraggeber (falls zutreffend)<input type="text" name="client" maxlength="200" placeholder="z. B. Firma, Partei, Verein"></label>
+
+      <h2>Erklärungen</h2>
+      <div class="box" style="padding:6px 16px">
+        <label class="chk"><input type="checkbox" name="identity"><span>Ich bin die im Video gezeigte Person, volljährig, und handle für mich selbst.<span class="req">PFLICHT</span></span></label>
+        <label class="chk"><input type="checkbox" name="purpose"><span>Ich willige ein, dass aus meinem Video ein digitaler Avatar meines Gesichts und ein Klon meiner Stimme erstellt und im gewählten Umfang verwendet werden (Abschnitte 2 und 3).<span class="req">PFLICHT</span></span></label>
+        <label class="chk"><input type="checkbox" name="processors"><span>Ich willige in die Verarbeitung durch die in Abschnitt 4 genannten Dienstleister einschließlich Übermittlung in die USA ein.<span class="req">PFLICHT</span></span></label>
+        <label class="chk"><input type="checkbox" name="label"><span>Ich bin einverstanden, dass alle Videos als KI-generiert gekennzeichnet werden (Abschnitt 5).<span class="req">PFLICHT</span></span></label>
+        <label class="chk"><input type="checkbox" name="withdraw"><span>Ich habe verstanden, dass ich jederzeit widerrufen kann und was dann gelöscht wird (Abschnitt 6).<span class="req">PFLICHT</span></span></label>
+        <label class="chk"><input type="checkbox" name="notpolitical"><span>Ich bin derzeit weder Kandidat:in für ein politisches Wahlamt noch gewählte:r Amtsträger:in. (Vorgabe der Nutzungsrichtlinie unseres Stimmdienstleisters; bei Änderung informiere ich Persona.)<span class="req">PFLICHT</span></span></label>
+        <label class="chk"><input type="checkbox" name="approve"><span>Optional: Ich möchte jedes Video vor Veröffentlichung selbst freigeben.</span></label>
+      </div>
+      <label class="hp" aria-hidden="true">Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+      <div class="noprint" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn gold" type="submit">Einwilligung abgeben</button>
+        <button class="btn ghost" type="button" onclick="window.print()">Drucken / als PDF speichern</button>
+      </div>
+      <div class="msg" id="msg-de"></div>
+      <div class="sig"><div>Ort, Datum</div><div>Unterschrift</div></div>
+    </form>
+    <div class="box done" id="done-de">
+      <h2 style="margin-top:0">Danke. Deine Einwilligung ist gespeichert.</h2>
+      <p>Nachweis-Nr. <b id="cid-de"></b>, Version <span class="ver">2026-08-21.1</span>, Zeitpunkt wird serverseitig protokolliert. Du bekommst eine Kopie per E-Mail, sobald wir dich kontaktieren; du kannst diese Seite jetzt auch drucken oder als PDF speichern.</p>
+      <button class="btn ghost noprint" type="button" onclick="window.print()">Drucken / PDF</button>
+    </div>
+  </div>
+
+  <!-- ===================== ENGLISH ===================== -->
+  <div data-l="en">
+    <p class="meta">Consent form · Version <span class="ver">2026-08-21.1</span></p>
+    <h1>Consent to the creation and use of my digital avatar (face and voice)</h1>
+    <p>Please read this declaration carefully. You can submit it online or print and sign it.</p>
+
+    <div class="box" id="txt-en">
+      <h2>1. Who is responsible?</h2>
+      <p><b>Max Stadler</b>, Wartstrasse 17, 8400 Winterthur, Switzerland, email <a href="mailto:max@letstalk.team">max@letstalk.team</a> (“Persona”, “we”). See the <a href="/impressum">legal notice</a>.</p>
+
+      <h2>2. What is this about?</h2>
+      <p>From a video (with sound) that I provide, the following will be created: (a) a <b>digital avatar</b> of my face and (b) a <b>synthetic voice</b> modelled on my voice (voice clone). With both, videos can be generated in which “I” speak texts I did not record myself. Face and voice are <b>biometric data</b> (Art. 9 GDPR, Art. 5 lit. c Swiss FADP). They are processed solely on the basis of this consent.</p>
+
+      <h2>3. What may the avatar and voice be used for?</h2>
+      <p>Only for videos within the scope selected below. Every script comes from me or from the organisation I name. Persona does not create content with my avatar on its own initiative and does not pass the avatar or voice to third parties. Never permitted: deceptive, degrading, sexualised or unlawful content, or presenting a video as a “real” recording.</p>
+
+      <h2>4. Who processes the data?</h2>
+      <ul>
+        <li><b>Hetzner Online GmbH</b> (Germany): storage and processing on our servers</li>
+        <li><b>ElevenLabs Inc.</b> (USA): voice clone and speech synthesis</li>
+        <li><b>Replicate, Inc.</b> (USA): lip synchronisation, matting, transcription</li>
+        <li><b>Anthropic, PBC</b> (USA): script assistant (text only, no biometrics)</li>
+      </ul>
+      <p>Data is transferred to the USA (standard contractual clauses or EU-US Data Privacy Framework). Details in the <a href="/datenschutz">privacy policy</a> (German).</p>
+
+      <h2>5. Labelling</h2>
+      <p>All videos generated with my avatar are <b>labelled as AI-generated</b>: visibly in the picture and machine-readably in the video file (EU AI Act, Art. 50). I agree to this.</p>
+
+      <h2>6. Duration, withdrawal, deletion</h2>
+      <p>This consent is valid until I withdraw it. I can withdraw it <b>at any time without giving reasons</b> by email to <a href="mailto:max@letstalk.team">max@letstalk.team</a>. After withdrawal, the source video, avatar and voice clone (including at the voice provider) and any unpublished videos are deleted within <b>14 days</b>. Persona cannot recall videos that have already been published; their removal is up to me or the publishing organisation. Proof of this consent is retained for documentation purposes (Art. 7(1) GDPR).</p>
+
+      <h2>7. My rights</h2>
+      <p>Access, rectification, erasure, restriction, data portability, objection, and complaint to a supervisory authority. Consent is voluntary; without it no avatar can be created, but I suffer no other disadvantage.</p>
+    </div>
+
+    <form id="f-en">
+      <h2>My details</h2>
+      <div class="row">
+        <label class="f">Full name<input type="text" name="name" required maxlength="120" autocomplete="name"></label>
+        <label class="f">Email<input type="email" name="email" required maxlength="200" autocomplete="email"></label>
+      </div>
+      <h2>Scope</h2>
+      <label class="radio"><input type="radio" name="scope" value="self" checked><span><b>Only I myself</b> create or commission videos with my avatar.</span></label>
+      <label class="radio"><input type="radio" name="scope" value="client"><span><b>My organisation / client</b> may have videos created with my avatar (name below).</span></label>
+      <label class="radio"><input type="radio" name="scope" value="persona"><span><b>Persona may, on my behalf,</b> create videos from texts I have approved (“done-for-you”).</span></label>
+      <label class="f">Organisation / client (if applicable)<input type="text" name="client" maxlength="200" placeholder="e.g. company, party, association"></label>
+
+      <h2>Declarations</h2>
+      <div class="box" style="padding:6px 16px">
+        <label class="chk"><input type="checkbox" name="identity"><span>I am the person shown in the video, of legal age, and acting for myself.<span class="req">REQUIRED</span></span></label>
+        <label class="chk"><input type="checkbox" name="purpose"><span>I consent to a digital avatar of my face and a clone of my voice being created from my video and used within the selected scope (sections 2 and 3).<span class="req">REQUIRED</span></span></label>
+        <label class="chk"><input type="checkbox" name="processors"><span>I consent to processing by the providers named in section 4, including transfer to the USA.<span class="req">REQUIRED</span></span></label>
+        <label class="chk"><input type="checkbox" name="label"><span>I agree that all videos are labelled as AI-generated (section 5).<span class="req">REQUIRED</span></span></label>
+        <label class="chk"><input type="checkbox" name="withdraw"><span>I understand that I can withdraw at any time and what will be deleted (section 6).<span class="req">REQUIRED</span></span></label>
+        <label class="chk"><input type="checkbox" name="notpolitical"><span>I am currently neither a candidate for political office nor an elected official. (Requirement of our voice provider’s usage policy; I will inform Persona if this changes.)<span class="req">REQUIRED</span></span></label>
+        <label class="chk"><input type="checkbox" name="approve"><span>Optional: I want to approve each video myself before publication.</span></label>
+      </div>
+      <label class="hp" aria-hidden="true">Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+      <div class="noprint" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn gold" type="submit">Give consent</button>
+        <button class="btn ghost" type="button" onclick="window.print()">Print / save as PDF</button>
+      </div>
+      <div class="msg" id="msg-en"></div>
+      <div class="sig"><div>Place, date</div><div>Signature</div></div>
+    </form>
+    <div class="box done" id="done-en">
+      <h2 style="margin-top:0">Thank you. Your consent has been recorded.</h2>
+      <p>Record no. <b id="cid-en"></b>, version <span class="ver">2026-08-21.1</span>; the time is logged server-side. You will receive a copy by email when we contact you; you can also print this page or save it as a PDF now.</p>
+      <button class="btn ghost noprint" type="button" onclick="window.print()">Print / PDF</button>
+    </div>
+  </div>
+
+  <footer>© Persona · <a href="/impressum">Impressum / Legal notice</a> · <a href="/datenschutz">Datenschutz / Privacy</a> · <a href="/">Start</a></footer>
+</div>
+
+<script>
+const html = document.documentElement;
+function setLang(l){ html.setAttribute('data-lang', l); html.lang = l;
+  document.getElementById('lde').classList.toggle('on', l==='de'); document.getElementById('len').classList.toggle('on', l==='en'); }
+document.getElementById('lde').onclick = () => setLang('de');
+document.getElementById('len').onclick = () => setLang('en');
+setLang((location.hash === '#en' || (navigator.language||'').toLowerCase().startsWith('en')) && location.hash !== '#de' ? 'en' : 'de');
+
+async function sha256(s){ const b = new TextEncoder().encode(s); const h = await crypto.subtle.digest('SHA-256', b);
+  return [...new Uint8Array(h)].map(x => x.toString(16).padStart(2,'0')).join(''); }
+
+for (const lang of ['de','en']){
+  const f = document.getElementById('f-'+lang), msg = document.getElementById('msg-'+lang);
+  const T = lang==='de' ? {name:'Bitte den vollständigen Namen angeben.', email:'Bitte eine gültige E-Mail-Adresse angeben.',
+      req:'Bitte alle Pflichtfelder bestätigen.', client:'Bitte die Organisation angeben.', busy:'Wird gespeichert …', send:'Einwilligung abgeben',
+      fail:'Das hat nicht geklappt. Bitte später erneut versuchen.', net:'Keine Verbindung. Bitte später erneut versuchen.'}
+    : {name:'Please enter your full name.', email:'Please enter a valid email address.', req:'Please confirm all required items.',
+      client:'Please name the organisation.', busy:'Saving …', send:'Give consent', fail:'That did not work. Please try again later.', net:'No connection. Please try again later.'};
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault(); msg.className='msg'; msg.textContent='';
+    const fd = new FormData(f);
+    const checks = {}; for (const k of ['identity','purpose','processors','label','withdraw','notpolitical','approve']) checks[k] = !!fd.get(k);
+    const body = { name: fd.get('name')||'', email: fd.get('email')||'', lang, scope: fd.get('scope')||'self',
+      client: fd.get('client')||'', checks, website: fd.get('website')||'', text_hash: '' };
+    if (body.name.trim().length < 2) { msg.className='msg err'; msg.textContent=T.name; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(body.email.trim())) { msg.className='msg err'; msg.textContent=T.email; return; }
+    if (['identity','purpose','processors','label','withdraw','notpolitical'].some(k => !checks[k])) { msg.className='msg err'; msg.textContent=T.req; return; }
+    if (body.scope === 'client' && !body.client.trim()) { msg.className='msg err'; msg.textContent=T.client; return; }
+    try { body.text_hash = await sha256(document.getElementById('txt-'+lang).innerText); } catch(_) {}
+    const btn = f.querySelector('button[type=submit]'); btn.disabled = true; btn.textContent = T.busy;
+    try {
+      const r = await fetch('/api/consent', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) { f.style.display = 'none'; const d = document.getElementById('done-'+lang); d.style.display='block';
+        document.getElementById('cid-'+lang).textContent = '#' + j.id; d.scrollIntoView({behavior:'smooth', block:'center'}); }
+      else { msg.className='msg err'; msg.textContent = j.detail || T.fail; }
+    } catch(err) { msg.className='msg err'; msg.textContent = T.net; }
+    btn.disabled = false; btn.textContent = T.send;
+  });
+}
+</script>
+</body>
+</html>

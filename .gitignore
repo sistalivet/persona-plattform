@@ -1,0 +1,10 @@
+# Daten und Geheimnisse bleiben auf dem Server (Backups: persona-backup.timer)
+data/
+__pycache__/
+*.pyc
+*.bak*
+*.sqlite
+*.db
+notify.json
+platform_app_neu.py
+.pytest_cache/

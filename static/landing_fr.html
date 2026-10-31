@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Persona · Votre studio IA personnel</title>
+<meta name="description" content="Être visible régulièrement, sans journée de tournage. Persona transforme 30 secondes de vidéo smartphone en votre jumeau numérique : visage, voix, style. Ensuite, un texte suffit.">
+<meta property="og:title" content="Persona · Votre studio IA personnel">
+<meta property="og:description" content="Être visible régulièrement, sans journée de tournage. Configurez une fois, puis écrivez simplement.">
+<meta property="og:image" content="/static/landing/demo.jpg?v=2">
+<meta property="og:type" content="website">
+<link rel="alternate" hreflang="de" href="/">
+<link rel="alternate" hreflang="en" href="/en">
+<link rel="alternate" hreflang="fr" href="/fr">
+<style>
+  :root{
+    --bg:#100f12; --surface:#1a181e; --surface-2:#211e26; --line:#2c2831; --line-2:#3a3540;
+    --ink:#f3ede2; --muted:#a89f95; --faint:#756d66;
+    --gold:#e9b96a; --gold-bright:#f4cd86; --gold-deep:#c89441; --gold-soft:#241d12; --danger:#ea7c63; --ok:#8fcf9a;
+    --serif:"Georgia","Iowan Old Style",ui-serif,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;
+    background-image:
+      radial-gradient(120% 50% at 50% -10%, rgba(233,185,106,.13), transparent 60%),
+      radial-gradient(80% 50% at 90% 30%, rgba(198,86,74,.07), transparent 60%)}
+  a{color:var(--gold-bright);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{width:min(1080px,92vw);margin:0 auto}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep);margin:0 0 14px}
+  h1,h2,h3{font-family:var(--serif);letter-spacing:-.02em;line-height:1.12;margin:0}
+  h1{font-size:clamp(38px,5.6vw,64px);font-weight:700}
+  h2{font-size:clamp(28px,3.6vw,40px);font-weight:700;margin-bottom:14px}
+  h3{font-size:20px;font-weight:700;margin-bottom:6px}
+  p{margin:0 0 14px}
+  .lead{font-size:19px;color:var(--muted);max-width:56ch}
+  .btn{display:inline-block;border-radius:10px;padding:13px 20px;font-weight:700;font-size:15px;letter-spacing:.02em;cursor:pointer;border:0;font-family:inherit}
+  .btn.gold{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#231a08}
+  .btn.gold:hover{filter:brightness(1.05);text-decoration:none}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+  .btn.ghost:hover{border-color:var(--gold);text-decoration:none}
+  .btn[disabled]{opacity:.55;cursor:wait}
+
+  nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);background:rgba(16,15,18,.78);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--serif);font-weight:700;font-size:26px;letter-spacing:-.03em;color:var(--ink)}
+  .brand .dot{color:var(--gold)}
+  nav ul{list-style:none;display:flex;gap:22px;margin:0;padding:0;align-items:center}
+  nav li a{color:var(--muted);font-size:14px}
+  nav li a:hover{color:var(--ink);text-decoration:none}
+  nav li a.login{border:1px solid var(--line-2);padding:7px 13px;border-radius:8px;color:var(--ink)}
+  .lang{font-family:var(--mono);font-size:12px;letter-spacing:.08em}
+  .lang b{color:var(--ink)}
+  @media (max-width:760px){ nav li.hide{display:none} }
+
+  .hero{padding:70px 0 50px}
+  .hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+  @media (max-width:860px){ .hero .wrap{grid-template-columns:1fr} .hero{padding-top:40px} }
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+  .small{font-size:13px;color:var(--faint);margin-top:14px}
+  .phone{position:relative;width:min(300px,78vw);aspect-ratio:9/16;margin:0 auto;border-radius:28px;overflow:hidden;
+    border:1px solid var(--line-2);background:#000;box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 60px rgba(233,185,106,.08)}
+  .phone video{width:100%;height:100%;object-fit:cover;display:block}
+  .badge{position:absolute;left:12px;top:12px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    background:rgba(16,15,18,.75);border:1px solid var(--line-2);color:var(--gold-bright);padding:6px 9px;border-radius:999px}
+  .sound{position:absolute;right:12px;bottom:12px;background:rgba(16,15,18,.8);border:1px solid var(--line-2);color:var(--ink);
+    border-radius:999px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+  .ai-note{text-align:center;font-size:12px;color:var(--faint);margin-top:12px}
+
+  section{padding:64px 0;border-top:1px solid var(--line)}
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  @media (max-width:900px){ .g3,.g4{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .g2,.g3,.g4{grid-template-columns:1fr} }
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .card p{color:var(--muted);font-size:15px;margin:0}
+  .num{font-family:var(--serif);color:var(--gold);font-size:34px;line-height:1;margin-bottom:10px}
+  .who{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .who span{border:1px solid var(--line-2);border-radius:999px;padding:7px 13px;font-size:14px;color:var(--muted)}
+  .who b{color:var(--ink);font-weight:600}
+
+  .offer{position:relative}
+  .offer.hot{border-color:var(--gold-deep);background:linear-gradient(180deg,var(--gold-soft),var(--surface))}
+  .offer .tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:8px}
+  .offer .price{font-family:var(--serif);font-size:28px;color:var(--ink);margin:6px 0 12px}
+  .offer ul{margin:0 0 16px;padding-left:18px;color:var(--muted);font-size:15px}
+  .offer li{margin:4px 0}
+
+  .trust li{margin:0 0 10px;color:var(--muted);font-size:15px}
+  .trust b{color:var(--ink);font-weight:600}
+  .trust ul{padding-left:18px;margin:0}
+
+  form{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px;display:grid;gap:14px;max-width:640px}
+  label{display:grid;gap:6px;font-size:13px;color:var(--muted)}
+  input,select,textarea{background:#141218;border:1px solid var(--line-2);color:var(--ink);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit;width:100%}
+  input::placeholder,textarea::placeholder{color:var(--faint)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  textarea{min-height:90px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:560px){ .row{grid-template-columns:1fr} }
+  .check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted)}
+  .check input{width:auto;margin-top:3px}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+  .msg{min-height:20px;font-size:14px}
+  .msg.err{color:var(--danger)} .msg.ok{color:var(--ok)}
+  .done{background:var(--surface);border:1px solid var(--gold-deep);border-radius:16px;padding:26px;max-width:640px;display:none}
+
+  footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--faint);font-size:13px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="/fr">Persona<span class="dot">.</span></a>
+  <ul>
+    <li class="hide"><a href="#comment">Comment ça marche</a></li>
+    <li class="hide"><a href="#offres">Offres</a></li>
+    <li class="hide"><a href="#confiance">Confiance</a></li>
+    <li><a href="#essai" class="btn gold" style="padding:8px 14px;font-size:13px">Clip d’essai gratuit</a></li>
+    <li><a href="/login" class="login">Connexion</a></li>
+    <li><a class="lang" href="/" title="Deutsche Version">DE</a> <span class="lang" style="color:var(--faint)">·</span> <a class="lang" href="/en" title="English version">EN</a> <span class="lang" style="color:var(--faint)">·</span> <a class="lang" href="/fr" title="Version française"><b>FR</b></a></li>
+  </ul>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div>
+    <p class="eyebrow">Votre studio IA personnel</p>
+    <h1>Être visible régulièrement. Sans journée de tournage.</h1>
+    <p class="lead" style="margin-top:18px">Persona transforme 30 secondes de vidéo smartphone en votre jumeau numérique : visage, voix, style. Ensuite, un texte suffit, et vous recevez des vidéos courtes finalisées, avec sous-titres et habillage. En quelques minutes, pas en jours.</p>
+    <div class="cta">
+      <a class="btn gold" href="#essai">Demander un clip d’essai gratuit</a>
+      <a class="btn ghost" href="#comment">Comment ça marche</a>
+    </div>
+    <p class="small">Pas de studio, pas de caméra, pas d’apprentissage. Configurez une fois. Ensuite, vous ne faites plus qu’écrire.</p>
+    <div class="who">
+      <span><b>Consultant·es</b> &amp; expert·es</span>
+      <span><b>Podcasteurs</b> &amp; créateurs</span>
+      <span><b>Équipes communication</b></span>
+      <span><b>Politique</b> &amp; ONG</span>
+    </div>
+  </div>
+  <div>
+    <div class="phone">
+      <span class="badge">Créé avec Persona</span>
+      <video id="demo" src="/static/landing/demo.mp4?v=2" poster="/static/landing/demo.jpg?v=2" autoplay muted loop playsinline></video>
+      <button class="sound" id="snd" type="button">🔇 Activer le son</button>
+    </div>
+    <p class="ai-note">Vidéo générée par IA · visage et voix utilisés avec le consentement de la personne représentée</p>
+  </div>
+</div></header>
+
+<section id="comment"><div class="wrap">
+  <p class="eyebrow">Comment ça marche</p>
+  <h2>Trois étapes. La première une seule fois.</h2>
+  <div class="grid g3" style="margin-top:26px">
+    <div class="card"><div class="num">1</div><h3>Configurer une fois</h3>
+      <p>Vous envoyez une courte vidéo smartphone de vous (30 secondes suffisent) et confirmez votre consentement. Nous en créons votre avatar et votre voix clonée. Une fois, plus jamais.</p></div>
+    <div class="card"><div class="num">2</div><h3>Du texte au lieu de la caméra</h3>
+      <p>Quelques notes suffisent : l’assistant de script en fait un texte parlé, dans votre ton. Modifiez ce que vous voulez, puis cliquez sur « Créer ».</p></div>
+    <div class="card"><div class="num">3</div><h3>Entièrement produit</h3>
+      <p>Synchronisation labiale, étalonnage des couleurs, sous-titres incrustés, bandeau et logo. En option avec un nouvel arrière-plan, et dans tous les formats : 9:16, 4:5, 1:1, 16:9.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="eyebrow">Ce que vous obtenez</p>
+  <h2>Pas « un avatar ». Votre studio.</h2>
+  <p class="lead">Les modèles en dessous sont interchangeables. Ce qui reste, c’est votre configuration : votre voix, votre look, votre ton, votre habillage : enregistrés, réutilisables, cohérents.</p>
+  <div class="grid g3" style="margin-top:26px">
+    <div class="card"><h3>Votre voix</h3><p>Clonée à partir de votre vidéo. En option, traduite dans d’autres langues, avec votre voix.</p></div>
+    <div class="card"><h3>Votre look</h3><p>Des rendus chauds et cinématographiques plutôt qu’un vernis IA stérile. Réglages fins : contraste, chaleur, luminosité, vignettage.</p></div>
+    <div class="card"><h3>Sous-titres &amp; habillage</h3><p>Sous-titres incrustés au mot près. Logo, bandeau avec nom et titre, vos couleurs.</p></div>
+    <div class="card"><h3>Arrière-plans</h3><p>Bureau, bibliothèque, studio, ville de nuit, détourage propre et composition soignée.</p></div>
+    <div class="card"><h3>Assistant de script</h3><p>Des notes deviennent un texte parlé dans votre ton. Le ton est enregistré par avatar.</p></div>
+    <div class="card"><h3>Tous les formats</h3><p>Créez une fois, publiez en 9:16, 4:5, 1:1 et 16:9 : LinkedIn, Shorts, Reels, site web.</p></div>
+  </div>
+</div></section>
+
+<section id="offres"><div class="wrap">
+  <p class="eyebrow">Offres</p>
+  <h2>Commencer petit. Sans risque.</h2>
+  <div class="grid g3" style="margin-top:26px">
+    <div class="card offer hot">
+      <div class="tag">Pour commencer</div>
+      <h3>Clip d’essai gratuit</h3>
+      <div class="price">0 €</div>
+      <ul>
+        <li>Un clip de 20 secondes avec votre visage et votre voix</li>
+        <li>Vous envoyez 30 s de vidéo smartphone + trois phrases de texte</li>
+        <li>Résultat sous 48 heures</li>
+        <li>Sans engagement, données supprimées sur demande</li>
+      </ul>
+      <a class="btn gold" href="#essai">Demander le clip d’essai</a>
+    </div>
+    <div class="card offer">
+      <div class="tag">Pour ceux qui parlent souvent</div>
+      <h3>Pilote « clé en main »</h3>
+      <div class="price">sur demande</div>
+      <ul>
+        <li>4 à 8 vidéos finalisées par mois à partir de vos sujets</li>
+        <li>Configuration, look, habillage et sous-titres inclus</li>
+        <li>Suivi personnel, résiliable chaque mois</li>
+        <li>Idéal pour consultant·es, expert·es, équipes</li>
+      </ul>
+      <a class="btn ghost" href="#essai" data-interest="pilot">Demander le pilote</a>
+    </div>
+    <div class="card offer">
+      <div class="tag">En autonomie</div>
+      <h3>Persona Studio</h3>
+      <div class="price">Bêta</div>
+      <ul>
+        <li>Votre propre accès au studio : script → vidéo en quelques minutes</li>
+        <li>Gérez vous-même avatars, voix, looks et habillage</li>
+        <li>Actuellement en bêta fermée avec des utilisateurs sélectionnés</li>
+        <li>Liste d’attente ouverte</li>
+      </ul>
+      <a class="btn ghost" href="#essai" data-interest="warteliste">Rejoindre la liste d’attente</a>
+    </div>
+  </div>
+</div></section>
+
+<section id="confiance"><div class="wrap">
+  <div class="grid g2" style="align-items:start">
+    <div>
+      <p class="eyebrow">Confiance</p>
+      <h2>Votre visage, votre voix, vos règles.</h2>
+      <p class="lead">Les médias synthétiques ont besoin de limites claires. Chez Persona, elles sont intégrées, pas ajoutées après coup.</p>
+    </div>
+    <div class="trust"><ul>
+      <li><b>Uniquement avec consentement.</b> Les avatars sont créés exclusivement par la personne elle-même ou avec son consentement documenté.</li>
+      <li><b>Marquage.</b> Nous recommandons et facilitons le marquage des vidéos générées par IA, comme le prévoit l’AI Act européen.</li>
+      <li><b>Hébergé en Allemagne.</b> La plateforme tourne sur des serveurs Hetzner. Vos données sont strictement séparées par compte.</li>
+      <li><b>Supprimable.</b> Avatar, voix et vidéos sont entièrement effacés sur demande.</li>
+      <li><b>Transparence.</b> La synthèse vocale et labiale s’appuie sur des services IA spécialisés ; lesquels, c’est indiqué dans la <a href="/datenschutz">politique de confidentialité</a> (en allemand).</li>
+    </ul></div>
+  </div>
+</div></section>
+
+<section id="essai"><div class="wrap">
+  <p class="eyebrow">Clip d’essai gratuit</p>
+  <h2>Voyez-vous avant de décider.</h2>
+  <p class="lead">Inscrivez-vous ci-dessous. Sous 48 heures, vous recevrez une réponse personnelle avec l’étape suivante : envoyer une vidéo smartphone de 30 secondes, trois phrases de texte. C’est tout.</p>
+  <form id="leadform" novalidate>
+    <div class="row">
+      <label>Nom<input name="name" placeholder="Prénom et nom" required maxlength="120" autocomplete="name"></label>
+      <label>E-mail<input name="email" type="email" placeholder="vous@exemple.fr" required maxlength="200" autocomplete="email"></label>
+    </div>
+    <div class="row">
+      <label>Je suis …<select name="role">
+        <option value="berater">Consultant·e / expert·e</option>
+        <option value="podcast">Podcasteur / créateur</option>
+        <option value="kommunikation">Communication / entreprise</option>
+        <option value="politik">Politique / ONG</option>
+        <option value="agentur">Agence</option>
+        <option value="sonstiges">Autre</option>
+      </select></label>
+      <label>Intéressé·e par<select name="interest" id="interest">
+        <option value="probe">Clip d’essai gratuit</option>
+        <option value="pilot">Pilote « clé en main »</option>
+        <option value="warteliste">Liste d’attente Persona Studio</option>
+      </select></label>
+    </div>
+    <label>De quoi s’agit-il pour vous ? (facultatif)<textarea name="message" maxlength="2000" placeholder="Sujet, canal, fréquence des vidéos …"></textarea></label>
+    <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+    <label class="check"><input type="checkbox" name="consent" required>
+      <span>J’accepte que mes données soient enregistrées et utilisées pour traiter ma demande. Détails dans la <a href="/datenschutz" target="_blank">politique de confidentialité</a> (en allemand). Révocation possible à tout moment par e-mail.</span></label>
+    <div><button class="btn gold" type="submit" id="send">Envoyer la demande</button></div>
+    <div class="msg" id="msg"></div>
+  </form>
+  <div class="done" id="done">
+    <h3>Merci, votre demande est bien arrivée.</h3>
+    <p style="color:var(--muted);margin:8px 0 0">Vous aurez de nos nouvelles personnellement sous 48 heures. Préparez déjà une courte vidéo smartphone : caméra frontale, fond calme, 30 secondes de parole libre. Rien de plus.</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div>© <span id="y"></span> Persona · Your face · your voice · your style</div>
+  <div><a href="/impressum">Mentions légales</a> · <a href="/datenschutz">Confidentialité</a> · <a href="/login">Connexion</a> · <a href="/">Deutsch</a> · <a href="/en">English</a></div>
+</div></footer>
+
+<script>
+document.getElementById('y').textContent = new Date().getFullYear();
+
+const v = document.getElementById('demo'), snd = document.getElementById('snd');
+snd.addEventListener('click', () => { v.muted = !v.muted; if(!v.muted){ v.currentTime = 0; v.play(); }
+  snd.textContent = v.muted ? '🔇 Activer le son' : '🔊 Couper le son'; });
+
+document.querySelectorAll('[data-interest]').forEach(a => a.addEventListener('click', () => {
+  document.getElementById('interest').value = a.dataset.interest; }));
+
+const f = document.getElementById('leadform'), msg = document.getElementById('msg'), btn = document.getElementById('send');
+f.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  msg.className = 'msg'; msg.textContent = '';
+  const fd = new FormData(f);
+  const body = { name: fd.get('name')||'', email: fd.get('email')||'', role: fd.get('role')||'',
+    interest: fd.get('interest')||'probe', message: fd.get('message')||'', consent: !!fd.get('consent'),
+    website: fd.get('website')||'' };
+  if(body.name.trim().length < 2){ msg.className='msg err'; msg.textContent='Veuillez indiquer votre nom.'; return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(body.email.trim())){ msg.className='msg err'; msg.textContent='Veuillez indiquer une adresse e-mail valide.'; return; }
+  if(!body.consent){ msg.className='msg err'; msg.textContent='Veuillez accepter la politique de confidentialité.'; return; }
+  btn.disabled = true; btn.textContent = 'Envoi en cours …';
+  try{
+    const r = await fetch('/api/lead', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    if(r.ok){ f.style.display='none'; document.getElementById('done').style.display='block';
+      document.getElementById('done').scrollIntoView({behavior:'smooth', block:'center'}); }
+    else if(r.status === 429){ msg.className='msg err'; msg.textContent='Trop de demandes. Veuillez réessayer plus tard.'; }
+    else { msg.className='msg err'; msg.textContent='Cela n’a pas fonctionné. Vérifiez vos données ou réessayez plus tard.'; }
+  }catch(err){ msg.className='msg err'; msg.textContent='Pas de connexion. Veuillez réessayer plus tard.'; }
+  btn.disabled = false; btn.textContent = 'Envoyer la demande';
+});
+</script>
+</body>
+</html>

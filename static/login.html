@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Persona · Login</title>
+<style>
+  :root{
+    --bg:#100f12; --surface:#1a181e; --surface-2:#211e26; --line:#2c2831; --line-2:#3a3540;
+    --ink:#f3ede2; --muted:#a89f95; --faint:#756d66;
+    --gold:#e9b96a; --gold-bright:#f4cd86; --gold-deep:#c89441; --gold-soft:#241d12; --danger:#ea7c63;
+    --rose:#d98a7c;
+    --serif:"Georgia","Iowan Old Style",ui-serif,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);
+    font-family:var(--sans);font-size:16px;
+    background-image:
+      radial-gradient(120% 55% at 50% -10%, rgba(233,185,106,.12), transparent 60%),
+      radial-gradient(90% 60% at 84% 112%, rgba(198,86,74,.12), transparent 62%),
+      radial-gradient(70% 55% at 10% 118%, rgba(198,86,74,.06), transparent 60%)}
+  .card{width:min(380px,92vw);text-align:center;padding:8px 0}
+  .brand{font-family:var(--serif);font-weight:700;font-size:54px;letter-spacing:-.03em;line-height:1;margin:0;
+    text-shadow:0 0 50px rgba(233,185,106,.18)}
+  .brand .dot{color:var(--gold)}
+  .sub{font-family:var(--serif);font-style:italic;color:var(--gold-bright);font-size:17px;margin:12px 0 30px}
+  form{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 24px;text-align:left}
+  .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 12px;text-align:center}
+  input{background:#141218;border:1px solid var(--line-2);color:var(--ink);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit}
+  input::placeholder{color:var(--faint)}
+  input:focus{outline:none;border-color:var(--gold)}
+  button{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#231a08;border:0;border-radius:10px;
+    padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;letter-spacing:.02em}
+  button:hover{filter:brightness(1.05)}
+  .err{color:var(--danger);font-size:13px;min-height:18px;text-align:center}
+  .foot{color:var(--faint);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1 class="brand">Persona<span class="dot">.</span></h1>
+  <p class="sub">Your personal AI studio</p>
+  <form id="f">
+    <p class="lbl">Sign in</p>
+    <input id="u" placeholder="Username" autocomplete="username" required>
+    <input id="p" type="password" placeholder="Password" autocomplete="current-password" required>
+    <button type="submit">Log in</button>
+    <div id="err" class="err"></div>
+  </form>
+  <p class="foot">Your face · your voice · your style</p>
+</div>
+<script>
+document.getElementById('f').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const fd=new FormData();
+  fd.append('username', document.getElementById('u').value);
+  fd.append('password', document.getElementById('p').value);
+  const r=await fetch('/api/login',{method:'POST',body:fd});
+  if(r.ok){ location.href='/'; }
+  else { const j=await r.json().catch(()=>({detail:'Login failed'}));
+    document.getElementById('err').textContent = j.detail || 'Login failed'; }
+});
+</script>
+</body>
+</html>
