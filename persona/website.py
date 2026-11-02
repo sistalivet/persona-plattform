@@ -220,6 +220,10 @@ Autorinnen und Autoren. Er misst nur eins: Wie konstruktiv ist ein Text im Sinne
 <h2>Die Skala</h2>
 <p><b>60 bis 100:</b> lösungsorientiert, belegt, nüchtern bis ermutigend. <b>40 bis 59:</b> gemischt, oft Problembeschreibung mit einzelnen
 konstruktiven Elementen. <b>Unter 40:</b> reine Problembeschreibung, Alarmismus oder Meinung ohne Belege.</p>
+<h2>Die Marke „Aktuell“</h2>
+<p>Nicht jede wichtige Nachricht ist konstruktiv. Beiträge, die wir nach Aktualität und Relevanz auswählen, tragen statt des Scores
+die Marke <b>Aktuell</b>. Das gilt für die Nachmittagsausgabe und für jeden Beitrag, dessen Score unter 60 liegt. Der Score wird
+trotzdem berechnet und bleibt im Beitrag gespeichert; er sagt nichts über die Richtigkeit der Nachricht.</p>
 <h2>Was der Score nicht kann</h2>
 <p>Er prüft keine Fakten und erkennt keine Falschmeldungen. Er bewertet nur den Text, nicht Bilder oder Videos. Bei fremden Artikeln
 lesen wir nur den öffentlich zugänglichen Text; Bezahlartikel können wir nicht einschätzen. Jede Einschätzung im Medien-Check wird
@@ -547,10 +551,17 @@ def _meta_html(e: dict, P: str) -> str:
         parts.append(badge)
     return '<div class="meta">' + "".join(parts) + "</div>"
 
+AKTUELL_SCHWELLE = 60   # unter diesem Konstruktiv-Score traegt ein Beitrag die Marke "Aktuell" statt des Scores (2.11.2026)
+
 def _ist_aktuell(e: dict) -> bool:
     """Spur Aktuell (26.10.2026): Beitraege der Nachmittagsausgabe nach Aktualitaet; der Konstruktiv-Score
-    wird berechnet und gespeichert, aber nicht gezeigt, die Karte traegt stattdessen die Marke "Aktuell"."""
-    return e.get("spur") == "aktuell"
+    wird berechnet und gespeichert, aber nicht gezeigt, die Karte traegt stattdessen die Marke "Aktuell".
+    Seit 2.11.2026 gilt das auch fuer jeden Beitrag mit einem Score unter AKTUELL_SCHWELLE: Die Nachricht
+    ist nach Aktualitaet gewaehlt, ein niedriger Score sagt nichts ueber ihre Richtigkeit."""
+    if e.get("spur") == "aktuell":
+        return True
+    k = e.get("konstruktiv")
+    return isinstance(k, dict) and "score" in k and int(k["score"]) < AKTUELL_SCHWELLE
 
 def _aktuell_badge(e: dict) -> str:
     if not _ist_aktuell(e):
@@ -1687,6 +1698,10 @@ only: how constructive is a text in the sense of constructive journalism?</p>
 <h2>The scale</h2>
 <p><b>60 to 100:</b> solution-oriented, evidenced, sober to encouraging. <b>40 to 59:</b> mixed, often a problem description with some
 constructive elements. <b>Below 40:</b> pure problem description, alarmism or opinion without evidence.</p>
+<h2>The "Latest" label</h2>
+<p>Not every important story is constructive. Stories we pick for timeliness and relevance carry the label <b>Latest</b> instead of
+a score. This applies to the afternoon edition and to every story whose score is below 60. The score is still computed and stays
+stored with the story; it says nothing about whether the story is accurate.</p>
 <h2>What the score cannot do</h2>
 <p>It does not check facts and does not detect false reports. It assesses the text only, not pictures or videos. We apply the same
 criteria and the same scale to the German edition. If you think an assessment is wrong, you can reach us through the

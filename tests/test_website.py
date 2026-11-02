@@ -100,6 +100,18 @@ def test_plattform_seiten(client, html):
     assert client.get("/static/app.html").status_code == 200
 
 
+def test_marke_aktuell_unter_schwelle(P):
+    """Spur Aktuell und jeder Beitrag mit Score unter 60 tragen "Aktuell" statt des Scores (2.11.2026)."""
+    ist = P._ist_aktuell
+    assert ist({"spur": "aktuell", "konstruktiv": {"score": 80}})
+    assert ist({"konstruktiv": {"score": 59}})
+    assert ist({"konstruktiv": {"score": 22}})
+    assert not ist({"konstruktiv": {"score": 60}})
+    assert not ist({"konstruktiv": {"score": 74}})
+    assert not ist({})
+    assert not ist({"konstruktiv": None})
+
+
 def test_paket_stellt_alle_namen_bereit(P):
     """Die Werkzeuge daneben greifen über platform_app auf Funktionen zu (admin.py, mail_stats.py)."""
     for name in ("notify_lead", "_ntfy", "DATA", "_blog_entries", "_save_entry", "app", "_t", "require_user"):
