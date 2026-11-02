@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Dolmetscher</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  /* Layout: eine Spalte, zwei grosse Sprechtasten oben, Gesprächsverlauf darunter, Einstellungen ganz unten. */
+  :root {
+    --bg: #f6f4ef; --surface: #ffffff; --fg: #1f1d1a; --muted: #6b655c; --line: #d9d3c7;
+    --de: #1f4e79; --de-soft: #e3ecf5; --sk: #7a3a1e; --sk-soft: #f6e6dc; --warn: #9a3b1f;
+    --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17161a; --surface: #222126; --fg: #efece6; --muted: #a39d93; --line: #3a383f;
+      --de: #8fb8e8; --de-soft: #1d2b3b; --sk: #e0a07f; --sk-soft: #3b271d; --warn: #e89a7c; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17161a; --surface: #222126; --fg: #efece6; --muted: #a39d93; --line: #3a383f;
+    --de: #8fb8e8; --de-soft: #1d2b3b; --sk: #e0a07f; --sk-soft: #3b271d; --warn: #e89a7c; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.45;
+    padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  main { max-width: 640px; margin: 0 auto; display: grid; gap: 20px; }
+  h1 { font-family: var(--font-display); font-weight: 600; font-size: 1.6rem; margin: 0; text-wrap: balance; }
+  .sub { color: var(--muted); margin: 4px 0 0; font-size: .95rem; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 440px) { .buttons { grid-template-columns: 1fr; } }
+  .talk {
+    border: 2px solid var(--line); border-radius: 14px; background: var(--surface); padding: 22px 16px; min-height: 120px;
+    cursor: pointer; text-align: left; font: inherit; color: var(--fg); display: grid; gap: 6px; align-content: start;
+    transition: background .15s, border-color .15s; -webkit-user-select: none; user-select: none; touch-action: manipulation;
+  }
+  .talk:focus-visible { outline: 3px solid var(--de); outline-offset: 2px; }
+  .talk .who { font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+  .talk .what { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; }
+  .talk .hint { color: var(--muted); font-size: .9rem; }
+  .talk.de .who { color: var(--de); }
+  .talk.sk .who { color: var(--sk); }
+  .talk.listening { border-color: currentColor; }
+  .talk.de.listening { background: var(--de-soft); color: var(--de); }
+  .talk.sk.listening { background: var(--sk-soft); color: var(--sk); }
+  .talk.listening .what::after { content: " · hört zu"; font-weight: 500; }
+  .talk:disabled { opacity: .5; cursor: default; }
+  .status { min-height: 1.4em; color: var(--muted); font-size: .95rem; }
+  .status.warn { color: var(--warn); }
+  .log { display: grid; gap: 10px; }
+  .turn { display: grid; gap: 4px; padding: 12px 14px; border-radius: 12px; background: var(--surface); border-left: 4px solid var(--line); }
+  .turn.de { border-left-color: var(--de); }
+  .turn.sk { border-left-color: var(--sk); }
+  .turn .orig { color: var(--muted); font-size: .95rem; }
+  .turn .trans { font-family: var(--font-display); font-size: 1.2rem; font-weight: 500; }
+  .turn .tools { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+  .turn .tools button, .small { font: inherit; font-size: .85rem; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; }
+  .turn .tools button:focus-visible { outline: 2px solid var(--de); }
+  .turn .zeit { color: var(--muted); font-size: .8rem; align-self: center; }
+  .empty { color: var(--muted); font-size: .95rem; padding: 10px 0; }
+  details { border-top: 1px solid var(--line); padding-top: 12px; }
+  summary { cursor: pointer; color: var(--muted); font-size: .95rem; }
+  .settings { display: grid; gap: 12px; margin-top: 12px; }
+  .field { display: grid; gap: 4px; }
+  .field label { font-size: .9rem; color: var(--muted); }
+  .field input[type="password"], .field input[type="text"], .field select {
+    font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); width: 100%;
+  }
+  .field input:focus-visible, .field select:focus-visible { outline: 2px solid var(--de); }
+  .check { display: flex; gap: 8px; align-items: center; }
+  .note { font-size: .85rem; color: var(--muted); margin: 0; }
+  @media (prefers-reduced-motion: reduce) { .talk { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Dolmetscher</h1>
+    <p class="sub">Taste drücken, sprechen, kurz warten. Die Übersetzung wird angezeigt und vorgelesen.</p>
+  </header>
+
+  <div class="buttons">
+    <button class="talk de" id="btn-de" type="button">
+      <span class="who">Ich</span>
+      <span class="what">Deutsch sprechen</span>
+      <span class="hint" id="hint-de">wird auf Slowakisch vorgelesen</span>
+    </button>
+    <button class="talk sk" id="btn-sk" type="button">
+      <span class="who">Gegenüber</span>
+      <span class="what" id="what-sk">Hovorte po slovensky</span>
+      <span class="hint">wird auf Deutsch vorgelesen</span>
+    </button>
+  </div>
+
+  <p class="status" id="status" aria-live="polite"></p>
+
+  <section class="log" id="log" aria-label="Gesprächsverlauf">
+    <p class="empty" id="empty">Noch nichts gesagt.</p>
+  </section>
+
+  <details id="settings">
+    <summary>Einstellungen</summary>
+    <div class="settings">
+      <div class="field">
+        <label for="opt-code">Zugangscode</label>
+        <input type="password" id="opt-code" autocomplete="off" placeholder="Code aus der Redaktion">
+        <p class="note" id="code-note"></p>
+      </div>
+      <div class="field">
+        <label for="opt-lang">Sprache des Gegenübers</label>
+        <select id="opt-lang"></select>
+      </div>
+      <div class="field check">
+        <input type="checkbox" id="opt-speak" checked>
+        <label for="opt-speak">Übersetzung vorlesen</label>
+      </div>
+      <div class="field">
+        <label for="opt-voice">Stimme</label>
+        <select id="opt-voice">
+          <option value="auto">Browser, bei fehlender Sprache Serverstimme</option>
+          <option value="browser">Nur Browser</option>
+          <option value="server">Immer Serverstimme (ElevenLabs)</option>
+        </select>
+        <p class="note" id="voices"></p>
+      </div>
+      <p class="note">Die Spracherkennung läuft im Browser (am besten Chrome; auf dem iPhone Safari). Übersetzt wird mit Claude auf dem Persona-Server. Gespräche werden nicht gespeichert; die letzten vier Sätze bleiben nur im Browser als Zusammenhang für die Übersetzung.</p>
+    </div>
+  </details>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const btnDe = $('btn-de'), btnSk = $('btn-sk'), status = $('status'), log = $('log'), empty = $('empty');
+  const optSpeak = $('opt-speak'), optCode = $('opt-code'), optLang = $('opt-lang'), optVoice = $('opt-voice');
+  const voicesNote = $('voices'), codeNote = $('code-note');
+
+  // Sprachen des Gegenübers: Code -> [Name deutsch, Erkennungscode, Aufforderung in der Sprache]
+  const PARTNER = {
+    sk: ['Slowakisch', 'sk-SK', 'Hovorte po slovensky'], cs: ['Tschechisch', 'cs-CZ', 'Mluvte česky'],
+    pl: ['Polnisch', 'pl-PL', 'Mów po polsku'], hu: ['Ungarisch', 'hu-HU', 'Beszéljen magyarul'],
+    en: ['Englisch', 'en-GB', 'Speak English'], it: ['Italienisch', 'it-IT', 'Parli italiano'],
+    fr: ['Französisch', 'fr-FR', 'Parlez français'], es: ['Spanisch', 'es-ES', 'Hable español'],
+    pt: ['Portugiesisch', 'pt-PT', 'Fale português'], hr: ['Kroatisch', 'hr-HR', 'Govorite hrvatski'],
+    sr: ['Serbisch', 'sr-RS', 'Govorite srpski'], ro: ['Rumänisch', 'ro-RO', 'Vorbiți română'],
+    uk: ['Ukrainisch', 'uk-UA', 'Говоріть українською'], tr: ['Türkisch', 'tr-TR', 'Türkçe konuşun'],
+  };
+  for (const [k, v] of Object.entries(PARTNER)) {
+    const o = document.createElement('option'); o.value = k; o.textContent = v[0]; optLang.appendChild(o);
+  }
+  let partner = 'sk';
+  const LANG = () => ({
+    de: { rec: 'de-DE', short: 'de', target: partner },
+    sk: { rec: PARTNER[partner][1], short: partner, target: 'de' },
+  });
+
+  // Einstellungen im Browser merken (nur Bequemlichkeit, darf fehlen)
+  const get = (k, d) => { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } };
+  const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  optCode.value = get('dolm.code', '');
+  optSpeak.checked = get('dolm.speak', '1') !== '0';
+  optVoice.value = get('dolm.voice', 'auto');
+  partner = PARTNER[get('dolm.lang', 'sk')] ? get('dolm.lang', 'sk') : 'sk';
+  optLang.value = partner;
+  const applyLang = () => {
+    $('what-sk').textContent = PARTNER[partner][2];
+    $('hint-de').textContent = 'wird auf ' + PARTNER[partner][0] + ' vorgelesen';
+    loadVoices();
+  };
+  applyLang();
+  optCode.addEventListener('change', () => { set('dolm.code', optCode.value.trim()); checkCode(); });
+  optSpeak.addEventListener('change', () => set('dolm.speak', optSpeak.checked ? '1' : '0'));
+  optVoice.addEventListener('change', () => set('dolm.voice', optVoice.value));
+  optLang.addEventListener('change', () => { partner = optLang.value; set('dolm.lang', partner); kontext.length = 0; applyLang(); });
+
+  const setStatus = (text, warn) => { status.textContent = text || ''; status.classList.toggle('warn', !!warn); };
+
+  async function checkCode() {
+    const code = optCode.value.trim();
+    if (!code) { codeNote.textContent = 'Ohne Code keine Übersetzung.'; $('settings').open = true; return; }
+    try {
+      const r = await fetch('/api/dolmetscher/status?code=' + encodeURIComponent(code));
+      const d = await r.json();
+      codeNote.textContent = d.code_ok ? 'Code gültig.' + (d.serverstimme ? '' : ' Keine Serverstimme hinterlegt.') : 'Code stimmt nicht.';
+      if (!d.code_ok) $('settings').open = true;
+    } catch (e) { codeNote.textContent = 'Server nicht erreichbar.'; }
+  }
+  checkCode();
+
+  // ---- Spracherkennung (im Browser eingebaut) ----
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    setStatus('Dieser Browser hat keine Spracherkennung. Bitte in Chrome (Computer, Android) oder Safari (iPhone) öffnen.', true);
+    btnDe.disabled = btnSk.disabled = true;
+  }
+
+  let active = null, rec = null;
+
+  function listen(src) {
+    if (!SR) return;
+    if (active) { stop(); return; }
+    if (!optCode.value.trim()) { setStatus('Bitte zuerst den Zugangscode in den Einstellungen eintragen.', true); $('settings').open = true; return; }
+    speechSynthesis && speechSynthesis.cancel();
+    const btn = src === 'de' ? btnDe : btnSk;
+    rec = new SR();
+    rec.lang = LANG()[src].rec;
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+    let finalText = '', interim = '';
+    rec.onstart = () => { active = src; btn.classList.add('listening'); setStatus('Sprechen Sie jetzt.'); };
+    rec.onresult = ev => {
+      interim = '';
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        const r = ev.results[i];
+        if (r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript;
+      }
+      setStatus((finalText + ' ' + interim).trim() || 'Sprechen Sie jetzt.');
+    };
+    rec.onerror = ev => {
+      const map = {
+        'not-allowed': 'Mikrofon nicht erlaubt. Bitte im Browser den Zugriff auf das Mikrofon freigeben.',
+        'no-speech': 'Nichts gehört. Noch einmal drücken und näher ans Mikrofon.',
+        'audio-capture': 'Kein Mikrofon gefunden.',
+        'network': 'Die Spracherkennung braucht eine Internetverbindung.',
+        'language-not-supported': 'Diese Sprache wird von der Erkennung in diesem Browser nicht unterstützt.',
+      };
+      setStatus(map[ev.error] || ('Fehler bei der Erkennung: ' + ev.error), true);
+    };
+    rec.onend = () => {
+      btn.classList.remove('listening');
+      active = null;
+      const text = (finalText || interim).trim();
+      if (text) handle(src, text);
+      else if (!status.classList.contains('warn')) setStatus('');
+    };
+    try { rec.start(); } catch (e) { setStatus('Die Erkennung konnte nicht starten: ' + e.message, true); }
+  }
+  function stop() { try { rec && rec.stop(); } catch (e) {} }
+  btnDe.addEventListener('click', () => listen('de'));
+  btnSk.addEventListener('click', () => listen('sk'));
+
+  // ---- Übersetzung über den Persona-Server ----
+  const kontext = [];   // die letzten Sätze beider Seiten, nur im Browser
+  async function translate(text, from, to) {
+    const res = await fetch('/api/dolmetscher/uebersetzen', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, von: from, nach: to, code: optCode.value.trim(), kontext: kontext.slice(-4) }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || ('Server antwortet mit ' + res.status));
+    return data;
+  }
+
+  // ---- Vorlesen ----
+  let voices = [];
+  const hasVoice = l => voices.some(v => v.lang.toLowerCase().startsWith(l));
+  function loadVoices() {
+    voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+    if (!window.speechSynthesis) voicesNote.textContent = 'Dieser Browser hat keine Sprachausgabe; es spricht die Serverstimme.';
+    else if (!voices.length) voicesNote.textContent = '';
+    else voicesNote.textContent = 'Stimmen im Browser: Deutsch ' + (hasVoice('de') ? 'ja' : 'fehlt') + ', ' + PARTNER[partner][0] + ' ' + (hasVoice(partner) ? 'ja' : 'fehlt, dafür spricht die Serverstimme') + '.';
+  }
+  if (window.speechSynthesis) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+
+  let audio = null;
+  async function speak(text, lang) {
+    if (!optSpeak.checked) return;
+    const mode = optVoice.value;
+    const browserOk = window.speechSynthesis && hasVoice(lang);
+    if (mode === 'browser' || (mode === 'auto' && browserOk)) {
+      if (!window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const v = voices.find(v => v.lang.toLowerCase().startsWith(lang) && /google|natural|premium|enhanced|online/i.test(v.name))
+            || voices.find(v => v.lang.toLowerCase().startsWith(lang));
+      if (v) u.voice = v;
+      u.lang = v ? v.lang : (lang === 'de' ? 'de-DE' : PARTNER[lang] ? PARTNER[lang][1] : lang);
+      u.rate = 0.95;
+      speechSynthesis.speak(u);
+      return;
+    }
+    try {
+      const res = await fetch('/api/dolmetscher/sprechen', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, sprache: lang, code: optCode.value.trim() }),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.detail || ('Stimme: ' + res.status)); }
+      const blob = await res.blob();
+      if (audio) { audio.pause(); URL.revokeObjectURL(audio.src); }
+      audio = new Audio(URL.createObjectURL(blob));
+      await audio.play();
+    } catch (e) { setStatus(e.message, true); }
+  }
+
+  // ---- Ablauf eines Satzes ----
+  async function handle(src, text) {
+    const L = LANG()[src];
+    const entry = addTurn(src, text, '…');
+    setStatus('Übersetze …');
+    try {
+      const d = await translate(text, L.short, L.target);
+      entry.trans.textContent = d.uebersetzt;
+      entry.zeit.textContent = d.dauer ? d.dauer.toFixed(1) + ' s' : '';
+      entry.replay.hidden = false;
+      entry.replay.onclick = () => speak(d.uebersetzt, L.target);
+      kontext.push({ von: L.short, text });
+      if (kontext.length > 8) kontext.shift();
+      setStatus('');
+      speak(d.uebersetzt, L.target);
+    } catch (e) {
+      entry.trans.textContent = 'Übersetzung fehlgeschlagen.';
+      setStatus(e.message, true);
+    }
+  }
+
+  function addTurn(src, orig, trans) {
+    empty.hidden = true;
+    const el = document.createElement('article');
+    el.className = 'turn ' + src;
+    const o = document.createElement('div'); o.className = 'orig'; o.textContent = (src === 'de' ? 'Ich: ' : 'Gegenüber: ') + orig;
+    const t = document.createElement('div'); t.className = 'trans'; t.textContent = trans;
+    const tools = document.createElement('div'); tools.className = 'tools';
+    const replay = document.createElement('button'); replay.type = 'button'; replay.textContent = 'Nochmals vorlesen'; replay.hidden = true;
+    const zeit = document.createElement('span'); zeit.className = 'zeit';
+    tools.append(replay, zeit);
+    el.append(o, t, tools);
+    log.prepend(el);
+    return { trans: t, replay, zeit };
+  }
+})();
+</script>
+</body>
+</html>

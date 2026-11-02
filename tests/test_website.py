@@ -112,6 +112,17 @@ def test_marke_aktuell_unter_schwelle(P):
     assert not ist({"konstruktiv": None})
 
 
+def test_dolmetscher(client):
+    """Seite ohne Anmeldung, API nur mit Zugangscode (2.11.2026)."""
+    r = client.get("/dolmetscher")
+    assert r.status_code == 200 and "Dolmetscher" in r.text and "noindex" in r.headers.get("x-robots-tag", "")
+    r = client.post("/api/dolmetscher/uebersetzen", json={"text": "Guten Tag", "von": "de", "nach": "sk", "code": "falsch"})
+    assert r.status_code == 401
+    r = client.post("/api/dolmetscher/sprechen", json={"text": "Dobrý deň", "sprache": "sk", "code": "falsch"})
+    assert r.status_code == 401
+    assert client.get("/api/dolmetscher/status?code=falsch").json()["code_ok"] is False
+
+
 def test_paket_stellt_alle_namen_bereit(P):
     """Die Werkzeuge daneben greifen über platform_app auf Funktionen zu (admin.py, mail_stats.py)."""
     for name in ("notify_lead", "_ntfy", "DATA", "_blog_entries", "_save_entry", "app", "_t", "require_user"):
