@@ -64,6 +64,11 @@
   .turn .tools button:focus-visible { outline: 2px solid var(--de); }
   .turn .zeit { color: var(--muted); font-size: .8rem; align-self: center; }
   .empty { color: var(--muted); font-size: .95rem; padding: 10px 0; }
+  .tippen { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tippen input { flex: 1 1 200px; font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+  .tippen input:focus-visible { outline: 2px solid var(--de); }
+  .code-row { display: flex; gap: 8px; }
+  .code-row input { flex: 1; }
   details { border-top: 1px solid var(--line); padding-top: 12px; }
   summary { cursor: pointer; color: var(--muted); font-size: .95rem; }
   .settings { display: grid; gap: 12px; margin-top: 12px; }
@@ -100,6 +105,12 @@
 
   <p class="status" id="status" aria-live="polite"></p>
 
+  <form class="tippen" id="tippen">
+    <input type="text" id="tipp-text" placeholder="Oder hier tippen …" autocomplete="off" aria-label="Satz eintippen">
+    <button type="submit" class="small" id="tipp-de">Deutsch → <span class="tipp-partner">Slowakisch</span></button>
+    <button type="button" class="small" id="tipp-sk"><span class="tipp-partner">Slowakisch</span> → Deutsch</button>
+  </form>
+
   <section class="log" id="log" aria-label="Gesprächsverlauf">
     <p class="empty" id="empty">Noch nichts gesagt.</p>
   </section>
@@ -109,7 +120,10 @@
     <div class="settings">
       <div class="field">
         <label for="opt-code">Zugangscode</label>
-        <input type="password" id="opt-code" autocomplete="off" placeholder="Code aus der Redaktion">
+        <div class="code-row">
+          <input type="text" id="opt-code" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Code aus der Redaktion">
+          <button type="button" class="small" id="code-check">Prüfen</button>
+        </div>
         <p class="note" id="code-note"></p>
       </div>
       <div class="field">
@@ -171,41 +185,64 @@
   const applyLang = () => {
     $('what-sk').textContent = PARTNER[partner][2];
     $('hint-de').textContent = 'wird auf ' + PARTNER[partner][0] + ' vorgelesen';
+    document.querySelectorAll('.tipp-partner').forEach(el => el.textContent = PARTNER[partner][0]);
     loadVoices();
   };
   applyLang();
-  optCode.addEventListener('change', () => { set('dolm.code', optCode.value.trim()); checkCode(); });
+  let codeTimer = null;
+  const codeChanged = () => { set('dolm.code', optCode.value.trim()); clearTimeout(codeTimer); codeTimer = setTimeout(checkCode, 400); };
+  optCode.addEventListener('input', codeChanged);
+  optCode.addEventListener('change', codeChanged);
+  optCode.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); codeChanged(); } });
+  $('code-check').addEventListener('click', () => { set('dolm.code', optCode.value.trim()); checkCode(); });
   optSpeak.addEventListener('change', () => set('dolm.speak', optSpeak.checked ? '1' : '0'));
   optVoice.addEventListener('change', () => set('dolm.voice', optVoice.value));
   optLang.addEventListener('change', () => { partner = optLang.value; set('dolm.lang', partner); kontext.length = 0; applyLang(); });
 
   const setStatus = (text, warn) => { status.textContent = text || ''; status.classList.toggle('warn', !!warn); };
 
+  let codeOk = false;
   async function checkCode() {
     const code = optCode.value.trim();
-    if (!code) { codeNote.textContent = 'Ohne Code keine Übersetzung.'; $('settings').open = true; return; }
+    codeOk = false;
+    if (!code) { codeNote.textContent = 'Ohne Code keine Übersetzung.'; $('settings').open = true; setStatus('Bitte den Zugangscode in den Einstellungen eintragen.', true); return; }
+    codeNote.textContent = 'Prüfe …';
     try {
       const r = await fetch('/api/dolmetscher/status?code=' + encodeURIComponent(code));
       const d = await r.json();
-      codeNote.textContent = d.code_ok ? 'Code gültig.' + (d.serverstimme ? '' : ' Keine Serverstimme hinterlegt.') : 'Code stimmt nicht.';
-      if (!d.code_ok) $('settings').open = true;
-    } catch (e) { codeNote.textContent = 'Server nicht erreichbar.'; }
+      codeOk = !!d.code_ok;
+      codeNote.textContent = codeOk ? 'Code gültig.' + (d.serverstimme ? '' : ' Keine Serverstimme hinterlegt.') : 'Code stimmt nicht.';
+      if (codeOk) { setStatus('Bereit. ' + (SR ? 'Taste drücken und sprechen, oder unten tippen.' : 'Dieser Browser kann nicht zuhören, bitte unten tippen.'), !SR); }
+      else { $('settings').open = true; setStatus('Der Zugangscode stimmt nicht.', true); }
+    } catch (e) { codeNote.textContent = 'Server nicht erreichbar.'; setStatus('Server nicht erreichbar.', true); }
   }
-  checkCode();
 
   // ---- Spracherkennung (im Browser eingebaut) ----
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
-    setStatus('Dieser Browser hat keine Spracherkennung. Bitte in Chrome (Computer, Android) oder Safari (iPhone) öffnen.', true);
+    setStatus('Dieser Browser hat keine Spracherkennung. Bitte in Chrome (Computer, Android) oder Safari (iPhone) öffnen; tippen geht trotzdem.', true);
     btnDe.disabled = btnSk.disabled = true;
   }
+  checkCode();
+
+  // Tippen statt sprechen (auch für Browser ohne Erkennung)
+  const tippText = $('tipp-text');
+  const tippen = src => {
+    const text = tippText.value.trim();
+    if (!text) { tippText.focus(); return; }
+    if (!codeOk) { $('settings').open = true; setStatus('Bitte zuerst den Zugangscode eintragen.', true); return; }
+    tippText.value = '';
+    handle(src, text);
+  };
+  $('tippen').addEventListener('submit', ev => { ev.preventDefault(); tippen('de'); });
+  $('tipp-sk').addEventListener('click', () => tippen('sk'));
 
   let active = null, rec = null;
 
   function listen(src) {
     if (!SR) return;
     if (active) { stop(); return; }
-    if (!optCode.value.trim()) { setStatus('Bitte zuerst den Zugangscode in den Einstellungen eintragen.', true); $('settings').open = true; return; }
+    if (!codeOk) { setStatus('Bitte zuerst den Zugangscode in den Einstellungen eintragen.', true); $('settings').open = true; return; }
     speechSynthesis && speechSynthesis.cancel();
     const btn = src === 'de' ? btnDe : btnSk;
     rec = new SR();
