@@ -154,6 +154,8 @@
   const btnDe = $('btn-de'), btnSk = $('btn-sk'), status = $('status'), log = $('log'), empty = $('empty');
   const optSpeak = $('opt-speak'), optCode = $('opt-code'), optLang = $('opt-lang'), optVoice = $('opt-voice');
   const voicesNote = $('voices'), codeNote = $('code-note');
+  let voices = [];   // Stimmen des Browsers; hier oben, weil applyLang() sie gleich beim Start braucht
+  const hasVoice = l => voices.some(v => v.lang.toLowerCase().startsWith(l));
 
   // Sprachen des Gegenübers: Code -> [Name deutsch, Erkennungscode, Aufforderung in der Sprache]
   const PARTNER = {
@@ -296,8 +298,6 @@
   }
 
   // ---- Vorlesen ----
-  let voices = [];
-  const hasVoice = l => voices.some(v => v.lang.toLowerCase().startsWith(l));
   function loadVoices() {
     voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
     if (!window.speechSynthesis) voicesNote.textContent = 'Dieser Browser hat keine Sprachausgabe; es spricht die Serverstimme.';
