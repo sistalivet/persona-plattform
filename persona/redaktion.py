@@ -500,8 +500,9 @@ def blog_posts(request: Request, lang: str = "de", ausgabe: str = ""):
     """ausgabe (oder lang): Schluessel der Ausgabe (de, en, ...) oder alle."""
     u = require_user(request)
     key = ausgabe or lang
-    ents = _blog_entries(None if key == "alle" else _ausgabe_key(key))
+    ents = _blog_entries(None if key == "alle" else _ausgabe_key(key), archiv=True)   # Redaktion sieht auch das Archiv
     return {"posts": [{"id": e["id"], "titel": e.get("titel", ""), "teaser": e.get("teaser", ""),
+                       "archiviert": e.get("archiviert") or "",          # Archiv (3.11.2026): Zeitstempel oder leer
                        "text": e.get("text", ""), "ressort": e.get("ressort", ""),
                        "quellen": e.get("quellen", []), "avatar": e.get("avatar", ""),
                        "video": e["video"], "published_at": e.get("published_at", ""),

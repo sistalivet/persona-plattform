@@ -1496,6 +1496,12 @@ def news_korrekturen(request: Request):
                 rows.append((str(k.get("datum", ""))[:10], e, k["text"]))
     rows.sort(key=lambda r: r[0], reverse=True)
     inner = f"<h1>{_t('corrections')}</h1><p class=\"sub\">{esc(_t('corrections_sub'))}</p>"
+    if _sprache() == "de":
+        # Transparenz zum Umbau vom 3. November 2026 (Kurzformat und Archiv, Entscheidung Max)
+        inner += ('<div class="korr"><b>3. November 2026</b> · Umstellung auf das Kurzformat: Seither haben unsere Beiträge zwei Absätze '
+                  'und nennen im ersten Satz, wer die Nachricht gemeldet hat. Die bis dahin erschienenen Beiträge sind archiviert und nicht '
+                  'mehr öffentlich; je Ressort blieben die drei jüngsten stehen und wurden auf das Kurzformat gekürzt. Überschriften, Videos '
+                  'und Kennzeichen im Herkunftsregister sind unverändert.</div>')
     if not rows:
         inner += f'<div class="empty">{esc(_t("corrections_none"))}</div>'
     else:
@@ -1650,6 +1656,10 @@ def news_article(pid: str, request: Request):
     e = _blog_entry(pid)
     if not e:
         raise HTTPException(404, _t("err_post"))
+    if e.get("archiviert") and not current_uid(request):
+        # Archiv (3.11.2026): der Beitrag bleibt gespeichert, ist aber nicht mehr oeffentlich; 410 sagt
+        # Suchmaschinen, dass die Adresse bewusst weg ist. Angemeldete Redaktion sieht ihn weiter.
+        raise HTTPException(410, _t("err_archiv"))
     if _eintrag_ausgabe(e) != _LANG.get():   # Beitrag gehoert zu einer anderen Ausgabe: dorthin leiten
         from fastapi.responses import RedirectResponse
         ziel = _eintrag_ausgabe(e)

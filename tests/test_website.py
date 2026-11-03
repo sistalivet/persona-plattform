@@ -123,6 +123,22 @@ def test_dolmetscher(client):
     assert client.get("/api/dolmetscher/status?code=falsch").json()["code_ok"] is False
 
 
+def test_archiv_nicht_oeffentlich(P, client, html):
+    """Archivierte Beiträge (3.11.2026) fehlen in den öffentlichen Listen, stehen aber in der Redaktionsliste;
+    ihre Seite antwortet 410 ohne Anmeldung."""
+    with P._lang("de"):
+        oeffentlich = P._blog_entries("de")
+        alle = P._blog_entries("de", archiv=True)
+    assert not any(e.get("archiviert") for e in oeffentlich)
+    assert len(alle) >= len(oeffentlich)
+    archiviert = [e for e in alle if e.get("archiviert")]
+    if not archiviert:
+        pytest.skip("noch nichts archiviert")
+    r = client.get(f"/news/{archiviert[0]['id']}", headers=html)
+    assert r.status_code == 410
+    assert archiviert[0]["id"] not in client.get("/news/sitemap.xml").text
+
+
 def test_paket_stellt_alle_namen_bereit(P):
     """Die Werkzeuge daneben greifen über platform_app auf Funktionen zu (admin.py, mail_stats.py)."""
     for name in ("notify_lead", "_ntfy", "DATA", "_blog_entries", "_save_entry", "app", "_t", "require_user"):

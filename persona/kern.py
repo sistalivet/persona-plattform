@@ -127,7 +127,8 @@ def _blog_alle() -> list:
             rec["poster"] = (stem + ".jpg") in namen
             rec["audio"] = (stem + ".mp3") in namen
             out.append(rec)
-            zeilen.append((stem, mt, dict(rec, _ausgabe=_eintrag_ausgabe(rec))))
+            if not rec.get("archiviert"):   # archivierte Beitraege (3.11.2026) stehen nicht im Suchindex
+                zeilen.append((stem, mt, dict(rec, _ausgabe=_eintrag_ausgabe(rec))))
     out.sort(key=lambda r: str(r.get("published_at", "")), reverse=True)
     with _BLOG_LOCK:
         _BLOG_CACHE["sig"], _BLOG_CACHE["alle"] = schluessel, out
@@ -137,13 +138,17 @@ def _blog_alle() -> list:
         print(f"[suche] Index nicht aktualisiert: {type(e).__name__}: {e}", file=sys.stderr)
     return out
 
-def _blog_entries(lang: str | None = "") -> list:
+def _blog_entries(lang: str | None = "", archiv: bool = False) -> list:
     """Beitraege der Ausgabe: lang "" = aktuelle Ausgabe (_LANG), None = alle, sonst der Schluessel
     einer Ausgabe (de, en, ...). Beitraege ohne `ausgabe` und ohne `sprache` gehoeren zur deutschen.
-    Flache Kopien der Eintraege im Speicher (_blog_alle)."""
+    Flache Kopien der Eintraege im Speicher (_blog_alle).
+    Archiv (Entscheidung Max, 3.11.2026): Beitraege mit dem Feld `archiviert` (Zeitstempel) bleiben
+    gespeichert, erscheinen aber nirgends auf der Website (Listen, Feeds, Sitemap, Suche, Dossiers,
+    Verwandte); nur die Redaktion sieht sie (archiv=True, API /api/blog/posts). Archiviert wird mit archiv.py."""
     if lang == "":
         lang = _LANG.get()
-    return [dict(r) for r in _blog_alle() if not lang or _eintrag_ausgabe(r) == lang]
+    return [dict(r) for r in _blog_alle()
+            if (not lang or _eintrag_ausgabe(r) == lang) and (archiv or not r.get("archiviert"))]
 
 def _blog_entry(pid: str) -> dict | None:
     if any(c in pid for c in ("..", "/", "\\")) or not pid:
@@ -337,6 +342,7 @@ _UI = {
         "score_word": "Konstruktiv", "crit_loesung": "Lösung benannt", "crit_belege": "Belege", "crit_grenzen": "Grenzen benannt",
         "ton": "Ton", "score_link": "KI-Einschätzung nach festen Kriterien. So bewerten wir →",
         "aktuell_word": "Aktuell", "aktuell_title": "Ausgewählt nach Aktualität und Relevanz, nicht nach konstruktivem Gehalt; dafür zeigen wir keinen Konstruktiv-Score.",
+        "err_archiv": "Dieser Beitrag ist archiviert und nicht mehr öffentlich.",
         "today_ed": "Tagesausgabe", "ed_of": "Ausgabe vom {d}", "stories_one": "ein Beitrag", "stories_n": "{n} Beiträge",
         "earlier": "Gestern und davor", "nature": "Natur", "nature_sub": "täglich ein Thema aus dem Natur-Scan: Landschaft, Klima, Landnutzung",
         "cards": "Die Karten zum Beitrag", "cards_sub": "aus dem Video, zum Vergrößern anklicken", "card_alt": "Karte {n}",
@@ -395,6 +401,7 @@ _UI = {
         "score_word": "Constructive", "crit_loesung": "Solution named", "crit_belege": "Evidence", "crit_grenzen": "Limits named",
         "ton": "Tone", "score_link": "AI assessment by fixed criteria. How we score →",
         "aktuell_word": "Latest", "aktuell_title": "Picked for timeliness and relevance rather than constructive content; no constructive score is shown for it.",
+        "err_archiv": "This story has been archived and is no longer public.",
         "today_ed": "Today's edition", "ed_of": "Edition of {d}", "stories_one": "one story", "stories_n": "{n} stories",
         "earlier": "Earlier", "nature": "Nature", "nature_sub": "one story a day from the nature scan",
         "cards": "The cards of this story", "cards_sub": "from the video, click to enlarge", "card_alt": "Card {n}",
