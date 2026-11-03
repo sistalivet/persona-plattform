@@ -126,6 +126,20 @@ def test_dolmetscher(client):
     assert client.get("/api/dolmetscher/status?code=falsch").json()["code_ok"] is False
 
 
+def test_kurzformat_auf_der_startseite(P, client, html):
+    """Kurzformat (3.11.2026): der ganze Text steht auf der Startseite, die Grenzen im Kasten, keine Bewertung."""
+    r = client.get("/news/", headers=html)
+    assert r.status_code == 200
+    with P._lang("de"):
+        kurz = [e for e in P._blog_entries("de") if P._ist_kurz(e)]
+        scores = P._site().get("show_scores", True)
+    if not kurz:
+        pytest.skip("kein Beitrag im Kurzformat")
+    assert 'class="grenzen"' in r.text and P._t("grenzen_label") in r.text
+    if not scores:
+        assert 'class="score' not in r.text
+
+
 def test_archiv_nicht_oeffentlich(P, client, html):
     """Archivierte Beiträge (3.11.2026) fehlen in den öffentlichen Listen, stehen aber in der Redaktionsliste;
     ihre Seite antwortet 410 ohne Anmeldung."""

@@ -375,6 +375,10 @@ article h2{font-family:"Source Serif 4",Georgia,serif;font-size:32px;line-height
 article p{margin:0 0 10px;color:var(--ink)}
 .teaser{font-size:17px;color:var(--ink);margin:0 0 12px}
 article .bd .teaser{font-weight:600;font-style:italic;font-size:17.5px;margin:2px 0 16px}
+.lead .bd p.text{font-size:17px;line-height:1.55;color:var(--ink);margin:0 0 12px}
+.grenzen{margin:14px 0 6px;padding:12px 16px;border-left:4px solid var(--accent-dark);border-radius:0 12px 12px 0;background:var(--bg)}
+.grenzen .glabel{display:block;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:4px}
+.grenzen p{margin:0;font-size:15.5px;line-height:1.5;color:var(--ink)}
 video{width:100%;border-radius:12px;background:#000;display:block}
 article.wide video,.lead.wide video{max-height:70vh;width:auto;max-width:100%;margin:0 auto}
 a.more{color:var(--accent-dark);text-decoration:none;font-weight:600;font-size:14px}
@@ -564,7 +568,7 @@ def _ist_aktuell(e: dict) -> bool:
     return isinstance(k, dict) and "score" in k and int(k["score"]) < AKTUELL_SCHWELLE
 
 def _aktuell_badge(e: dict) -> str:
-    if not _ist_aktuell(e):
+    if not _ist_aktuell(e) or not _site().get("show_scores", True):   # show_scores aus = keine Bewertung, auch keine Marke
         return ""
     return f'<span class="score s-akt" title="{_htmlmod.escape(_t("aktuell_title"))}">{_t("aktuell_word")}</span>'
 
@@ -587,16 +591,40 @@ def _layout_cls(e: dict) -> str:
         return "novid"
     return "wide" if int(e.get("w") or 0) > int(e.get("h") or 0) else ""
 
+def _absaetze_of(e: dict) -> list[str]:
+    return [p.strip() for p in str(e.get("text") or e.get("skript") or "").split("\n") if p.strip()]
+
+def _ist_kurz(e: dict) -> bool:
+    """Kurzformat (3.11.2026): zwei Absaetze, der zweite nennt die Grenzen. Aeltere Beitraege mit vier
+    Absaetzen (Archiv, Wochenrueckblick) werden wie bisher gezeigt."""
+    return len(_absaetze_of(e)) == 2
+
+def _text_html(e: dict, klasse: str = "") -> str:
+    """Der Text eines Beitrags: im Kurzformat der Anlass als Absatz und die Grenzen als Kasten
+    (Entscheidung Max, 3.11.2026), sonst alle Absaetze nacheinander."""
+    esc = _htmlmod.escape
+    paras = _absaetze_of(e)
+    cls = f' class="{klasse}"' if klasse else ""
+    if _ist_kurz(e):
+        return (f"<p{cls}>{esc(paras[0])}</p>"
+                f'<div class="grenzen"><span class="glabel">{esc(_t("grenzen_label"))}</span><p>{esc(paras[1])}</p></div>')
+    return "".join(f"<p{cls}>{esc(p)}</p>" for p in paras)
+
 def _lead_html(e: dict, counts: dict, P: str) -> str:
     esc = _htmlmod.escape
     pid = esc(e["id"])
     body = str(e.get("text") or e.get("skript") or "").strip()
     teaser = _teaser_of(e)
-    more = f'<a class="more" href="{P}/{pid}">{_t("read_more")}</a>' if (len(body) > len(teaser) + 20 or e.get("quellen")) else ""
+    if _ist_kurz(e):
+        # Kurzformat: der ganze Text steht schon auf der Startseite; der Link fuehrt zu Quellen, Karten und Register
+        inhalt = _text_html(e, "text") + f'<a class="more" href="{P}/{pid}">{_t("read_more")}</a>'
+    else:
+        more = f'<a class="more" href="{P}/{pid}">{_t("read_more")}</a>' if (len(body) > len(teaser) + 20 or e.get("quellen")) else ""
+        inhalt = f'<p class="teaser">{esc(teaser)}</p>{more}'
     return (f'<div class="lead {_layout_cls(e)}" data-post="{pid}">'
             f'<div class="hd"><h2><a href="{P}/{pid}">{esc(e["titel"])}</a></h2>{_meta_html(e, P)}</div>'
             f'{_video_html(e, P, preload="none")}'
-            f'<div class="bd"><p class="teaser">{esc(teaser)}</p>{more}</div>{_react_html(e, counts)}</div>')
+            f'<div class="bd">{inhalt}</div>{_react_html(e, counts)}</div>')
 
 def _card_html(e: dict, P: str) -> str:
     esc = _htmlmod.escape
@@ -670,10 +698,12 @@ def _verwandte_html(e: dict, ents: list, P: str) -> str:
 def _article_html(e: dict, counts: dict, P: str) -> str:
     esc = _htmlmod.escape
     pid = esc(e["id"])
-    body = str(e.get("text") or e.get("skript") or "")
-    content = "".join(f"<p>{esc(p.strip())}</p>" for p in body.split("\n") if p.strip())
-    if _nfc(e.get("teaser", "")):
-        content = f'<p class="teaser">{esc(_teaser_of(e))}</p>' + content
+    content = _text_html(e)
+    paras = _absaetze_of(e)
+    teaser = _teaser_of(e)
+    # der Teaser steht nur ueber dem Text, wenn er ihn nicht wiederholt (im Kurzformat ist er der Anfang des Anlasses)
+    if _nfc(e.get("teaser", "")) and not (paras and paras[0].startswith(teaser[:40])):
+        content = f'<p class="teaser">{esc(teaser)}</p>' + content
     content = _korrektur_html(e) + content
     q = e.get("quellen") or []
     if q:
@@ -746,7 +776,9 @@ def _jsonld_article(e: dict, site: dict, base: str, lang: str) -> dict:
         props.append({"@type": "PropertyValue", "name": "AI anchor (fictional)" if lang == "en" else "KI-Sprecher (fiktiv)",
                       "value": e["avatar"]})
     k = e.get("konstruktiv") or {}
-    if _ist_aktuell(e):
+    if not _site().get("show_scores", True):
+        pass   # Bewertung ausgeblendet (3.11.2026): weder Score noch Marke in den Daten
+    elif _ist_aktuell(e):
         # Spur Aktuell: ausgewaehlt nach Aktualitaet, ohne Score auf der Seite, also auch nicht in den Daten
         props.append({"@type": "PropertyValue", "name": "Track" if lang == "en" else "Spur",
                       "value": "Latest" if lang == "en" else "Aktuell"})
@@ -1060,9 +1092,14 @@ def news_page(request: Request):
     inner = (f'<div class="today"><h2>{_t("today_ed")}</h2>'
              f'<span>{esc(_t("ed_of").format(d=_datum_lang(tag, lang)))} · '
              f'{esc((_t("stories_one") if len(heute) == 1 else _t("stories_n")).format(n=len(heute)))}</span></div>')
+    # Kurzformat (3.11.2026, Entscheidung Max): jeder Beitrag des Tages steht mit seinem ganzen Text auf der
+    # Startseite; aeltere Beitraege mit vier Absaetzen bleiben Karten mit Teaser
     inner += _lead_html(heute[0], counts, P)
-    if heute[1:]:
-        inner += '<div class="grid">' + "".join(_card_html(e, P) for e in heute[1:7]) + "</div>"
+    rest = heute[1:7]
+    inner += "".join(_lead_html(e, counts, P) for e in rest if _ist_kurz(e))
+    karten = [e for e in rest if not _ist_kurz(e)]
+    if karten:
+        inner += '<div class="grid">' + "".join(_card_html(e, P) for e in karten) + "</div>"
     # das Versprechen in einem Satz und die Anmeldung, dort wo der Erstbesucher ist (30.10.2026)
     inner += _pitch_html(P)
     # Natur-Streifen: die Beitraege des Natur-Scans (Narrativ) bzw. des Ressorts Umwelt und Natur
