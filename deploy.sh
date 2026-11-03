@@ -7,7 +7,7 @@
 # Ablauf: Abruf, Tests gegen den neuen Code (nur lesend), kein Umschalten während ein Render läuft,
 # Neustart, Probe auf 127.0.0.1:8020. Scheitert ein Schritt, kommt der vorige Stand zurück und der
 # Dienst läuft weiter wie vorher. Jeder Schritt darf wiederholt werden (idempotent).
-set -u
+set -u -o pipefail   # pipefail (3.11.2026): ein Testfehler vor dem tail darf nicht als Erfolg gelten
 cd "/opt/persona/Twin Platform" || exit 1
 PY=/opt/persona/venv/bin/python
 ALT=$(git rev-parse HEAD 2>/dev/null || echo "")

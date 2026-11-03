@@ -1,5 +1,8 @@
 """Öffentliche Seiten und die Blog-API: was ein Besucher und die Kette sehen. Nur GET, keine Änderung."""
 
+import pytest
+
+
 def test_startseite(client, html):
     r = client.get("/news/", headers=html)
     assert r.status_code == 200
