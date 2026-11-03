@@ -477,6 +477,13 @@ nav a .nk{display:none}
   .lead.novid{grid-template-columns:1fr;grid-template-areas:"hd" "bd" "re"}
   .react{gap:6px;margin-top:6px}.react button{font-size:12px;padding:5px 10px}.react .q{font-size:11.5px}.react span{margin-left:4px}
   .lead .vid video{max-height:none;width:100%}.lead .vid{margin:0;align-self:start}.lead .bd .teaser{font-size:14.5px;margin-top:0}
+  /* Kurzformat (3.11.2026): der ganze Text steht auf der Startseite, also Video oben (links, klein) und der
+     Text darunter in voller Breite statt in der schmalen Spalte neben dem Video */
+  .lead.kurz{grid-template-columns:1fr;grid-template-areas:"hd" "vid" "bd" "re";gap:10px}
+  .lead.kurz .vid{margin:0;text-align:left}
+  .lead.kurz .vid video{width:46%;max-width:200px;max-height:none;margin:0}
+  .lead.kurz.wide .vid video{width:100%;max-width:100%}
+  .lead.kurz .bd p.text{font-size:16.5px}
   .ticker{font-size:12.5px;margin-bottom:10px}.tlabel{padding:6px 9px}}
 """
 
@@ -621,7 +628,8 @@ def _lead_html(e: dict, counts: dict, P: str) -> str:
     else:
         more = f'<a class="more" href="{P}/{pid}">{_t("read_more")}</a>' if (len(body) > len(teaser) + 20 or e.get("quellen")) else ""
         inhalt = f'<p class="teaser">{esc(teaser)}</p>{more}'
-    return (f'<div class="lead {_layout_cls(e)}" data-post="{pid}">'
+    kurz = " kurz" if _ist_kurz(e) else ""
+    return (f'<div class="lead {_layout_cls(e)}{kurz}" data-post="{pid}">'
             f'<div class="hd"><h2><a href="{P}/{pid}">{esc(e["titel"])}</a></h2>{_meta_html(e, P)}</div>'
             f'{_video_html(e, P, preload="none")}'
             f'<div class="bd">{inhalt}</div>{_react_html(e, counts)}</div>')
