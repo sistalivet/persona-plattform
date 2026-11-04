@@ -477,13 +477,19 @@ nav a .nk{display:none}
   .lead.novid{grid-template-columns:1fr;grid-template-areas:"hd" "bd" "re"}
   .react{gap:6px;margin-top:6px}.react button{font-size:12px;padding:5px 10px}.react .q{font-size:11.5px}.react span{margin-left:4px}
   .lead .vid video{max-height:none;width:100%}.lead .vid{margin:0;align-self:start}.lead .bd .teaser{font-size:14.5px;margin-top:0}
-  /* Kurzformat (3.11.2026): der ganze Text steht auf der Startseite, also Video oben (links, klein) und der
-     Text darunter in voller Breite statt in der schmalen Spalte neben dem Video */
-  .lead.kurz{grid-template-columns:1fr;grid-template-areas:"hd" "vid" "bd" "re";gap:10px}
-  .lead.kurz .vid{margin:0;text-align:left}
-  .lead.kurz .vid video{width:46%;max-width:200px;max-height:none;margin:0}
-  .lead.kurz.wide .vid video{width:100%;max-width:100%}
-  .lead.kurz .bd p.text{font-size:16.5px}
+  /* Kurzformat (3.11./4.11.2026): der ganze Text steht auf der Startseite. Das Video steht links und ist
+     freigestellt (float), der Text beginnt rechts daneben und laeuft darunter ueber die volle Breite weiter;
+     Kasten und Reaktionen beginnen unterhalb des Videos. Querformat-Videos stehen wie bisher oben ueber dem Text. */
+  .lead.kurz{display:block}
+  .lead.kurz::after{content:"";display:block;clear:both}
+  .lead.kurz .hd{margin-bottom:10px}
+  .lead.kurz .vid{float:left;width:42%;margin:2px 14px 6px 0;text-align:left}
+  .lead.kurz .vid video{width:100%;max-width:none;max-height:none;margin:0}
+  .lead.kurz.wide .vid{float:none;width:100%;margin:0 0 10px}
+  .lead.kurz .bd p.text{font-size:16px;line-height:1.5;margin:0 0 10px}
+  .lead.kurz .grenzen{clear:both}
+  .lead.kurz .react{clear:both}
+  .lead.kurz .bd a.more{display:inline-block;margin-top:4px}
   .ticker{font-size:12.5px;margin-bottom:10px}.tlabel{padding:6px 9px}}
 """
 
