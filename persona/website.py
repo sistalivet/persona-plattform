@@ -326,6 +326,9 @@ h1{font-family:"Source Serif 4",Georgia,serif;font-size:30px;margin:0 0 4px;lett
 .lead h2 a,.card h3 a{color:inherit;text-decoration:none}
 .lead h2 a:hover,.card h3 a:hover{color:var(--accent-dark)}
 .lead .teaser{font-size:15.5px}
+.lead.meldung{padding:14px 18px}
+.lead.meldung h2{font-size:20px;margin:0 0 6px}
+.lead.meldung .bd p.text{font-size:16px;line-height:1.5;margin:0 0 6px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 15px;display:flex;gap:13px;min-width:0}
 .card .th{flex:0 0 72px}
@@ -608,9 +611,14 @@ def _absaetze_of(e: dict) -> list[str]:
     return [p.strip() for p in str(e.get("text") or e.get("skript") or "").split("\n") if p.strip()]
 
 def _ist_kurz(e: dict) -> bool:
-    """Kurzformat (3.11.2026): zwei Absaetze, der zweite nennt die Grenzen. Aeltere Beitraege mit vier
-    Absaetzen (Archiv, Wochenrueckblick) werden wie bisher gezeigt."""
-    return len(_absaetze_of(e)) == 2
+    """Kurzformat (3.11.2026): zwei Absaetze, der zweite nennt die Grenzen; seit dem Dreitakt (8.11.2026) ein
+    einziger Absatz je Meldung. Aeltere Beitraege mit vier Absaetzen (Archiv, Wochenrueckblick) werden wie bisher gezeigt."""
+    return len(_absaetze_of(e)) in (1, 2)
+
+
+def _ist_meldung(e: dict) -> bool:
+    """Eine Meldung des Dreitakts: ein Absatz, kein Video. Sie steht kompakt in der Tagesausgabe."""
+    return len(_absaetze_of(e)) == 1 and not e.get("video")
 
 def _text_html(e: dict, klasse: str = "") -> str:
     """Der Text eines Beitrags: im Kurzformat der Anlass als Absatz und die Grenzen als Kasten
@@ -618,6 +626,8 @@ def _text_html(e: dict, klasse: str = "") -> str:
     esc = _htmlmod.escape
     paras = _absaetze_of(e)
     cls = f' class="{klasse}"' if klasse else ""
+    if _ist_kurz(e) and len(paras) == 1:
+        return f"<p{cls}>{esc(paras[0])}</p>"
     if _ist_kurz(e):
         return (f"<p{cls}>{esc(paras[0])}</p>"
                 f'<div class="grenzen"><span class="glabel">{esc(_t("grenzen_label"))}</span><p>{esc(paras[1])}</p></div>')
@@ -634,7 +644,7 @@ def _lead_html(e: dict, counts: dict, P: str) -> str:
     else:
         more = f'<a class="more" href="{P}/{pid}">{_t("read_more")}</a>' if (len(body) > len(teaser) + 20 or e.get("quellen")) else ""
         inhalt = f'<p class="teaser">{esc(teaser)}</p>{more}'
-    kurz = " kurz" if _ist_kurz(e) else ""
+    kurz = (" kurz" if _ist_kurz(e) else "") + (" meldung" if _ist_meldung(e) else "")
     return (f'<div class="lead {_layout_cls(e)}{kurz}" data-post="{pid}">'
             f'<div class="hd"><h2><a href="{P}/{pid}">{esc(e["titel"])}</a></h2>{_meta_html(e, P)}</div>'
             f'{_video_html(e, P, preload="none")}'
@@ -1103,13 +1113,15 @@ def news_page(request: Request):
     tag = _tag_berlin(ents[0].get("published_at", ""))
     heute = [e for e in ents if _tag_berlin(e.get("published_at", "")) == tag]
     frueher = [e for e in ents if e not in heute]
+    # Dreitakt (8.11.2026, Max): die Beitraege mit Video-Avatar stehen oben (neuester zuerst), danach die Meldungen
+    heute = [e for e in heute if e.get("video")] + [e for e in heute if not e.get("video")]
     inner = (f'<div class="today"><h2>{_t("today_ed")}</h2>'
              f'<span>{esc(_t("ed_of").format(d=_datum_lang(tag, lang)))} · '
              f'{esc((_t("stories_one") if len(heute) == 1 else _t("stories_n")).format(n=len(heute)))}</span></div>')
     # Kurzformat (3.11.2026, Entscheidung Max): jeder Beitrag des Tages steht mit seinem ganzen Text auf der
     # Startseite; aeltere Beitraege mit vier Absaetzen bleiben Karten mit Teaser
     inner += _lead_html(heute[0], counts, P)
-    rest = heute[1:7]
+    rest = heute[1:25]   # Dreitakt: bis zu 15 Beitraege am Tag, alle mit Text
     inner += "".join(_lead_html(e, counts, P) for e in rest if _ist_kurz(e))
     karten = [e for e in rest if not _ist_kurz(e)]
     if karten:
