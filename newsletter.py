@@ -35,7 +35,7 @@ TEXTE = {
                         "Wenn du das warst, bestätige die Anmeldung mit diesem Link:\n\n{link}\n\n"
                         "Wenn nicht, ignoriere diese Nachricht; es passiert nichts weiter.\n\nPersona AI News\n{seite}"),
         "betreff_tag": "Persona AI News, {datum}: {titel}",
-        "intro": "Die Beiträge von heute, kurz und konstruktiv, gesprochen von unseren Avataren.",
+        "intro": "Die Beiträge von heute, kurz und konstruktiv.",
         "lesen": "Zum Beitrag",
         "video": "Video ansehen",
         "fuss": "Du bekommst diese Mail, weil du den Newsletter von Persona AI News bestätigt hast.",

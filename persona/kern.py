@@ -197,7 +197,7 @@ def _nfc(s) -> str:
 SITE_FILE = DATA / "site.json"
 
 _SITE_DEFAULT = {"name": "Persona AI News",
-                 "claim": "Konstruktive Nachrichten, gesprochen von unseren Avataren.",
+                 "claim": "Konstruktive Nachrichten.",
                  "ressorts": ["Politik", "Deutschland", "Wirtschaft", "Finanzen", "Kultur",
                               "Sport", "Tech", "Außenpolitik"],
                  "about": "", "domain": "persona-ainews.ch", "indexable": False, "per_page": 20,
