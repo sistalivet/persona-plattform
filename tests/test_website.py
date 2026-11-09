@@ -136,7 +136,8 @@ def test_kurzformat_auf_der_startseite(P, client, html):
     if not kurz:
         pytest.skip("kein Beitrag im Kurzformat")
     # zwei Absaetze: der Kasten "Was offen ist"; seit dem Dreitakt (8.11.2026) haben die Meldungen nur einen Absatz
-    if any(f'data-post="{e["id"]}"' in r.text and len(P._absaetze_of(e)) == 2 for e in kurz):
+    if any(f'" data-post="{e["id"]}"' in r.text and r.text.split(f'" data-post="{e["id"]}"')[0].rsplit("<", 1)[-1].startswith('div class="lead')
+       and len(P._absaetze_of(e)) == 2 for e in kurz):
         assert 'class="grenzen"' in r.text and P._t("grenzen_label") in r.text
     if not scores:
         assert 'class="score' not in r.text
